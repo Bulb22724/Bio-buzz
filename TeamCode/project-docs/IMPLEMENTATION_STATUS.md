@@ -285,6 +285,26 @@ PVI-FTC | Editable master guide
   camera/robot-relative behavior remains separate and unchanged. No estimator, stored robot pose,
   odometry/Pedro write, fusion, alignment, autonomous, drivetrain, Limelight, or motor behavior was
   added.
+- LA-05 completed the software-only field-pose candidate audit without changing production code.
+  The checked-out FTC SDK localization sample confirms the current robot axes (+X right, +Y
+  forward, +Z up), measured camera-position signs, forward horizontal camera orientation (yaw 0,
+  pitch -90, roll 0), and use of SDK `robotPose` as the robot pose relative to the official field
+  origin. Focused checks passed for fresh-frame input, original acquisition timestamps, the
+  250-millisecond age gate, configured fixed IDs, metadata and finite-value gates, retained-frame
+  candidate removal, configuration immutability, and absence of FTC types in neutral localization
+  classes. Lifecycle and complete-diff review found no stale candidate acceptance, localization
+  provider write, drive/FSM request, autonomous decision, Limelight behavior, blocking wait, or
+  motor command. The JDK 17 TeamCode build and `git diff --check` passed.
+- LA-06 remains a physical STOP gate. Before it can begin, the team must currently reconfirm the
+  reviewed C920 and secure measured mount; configured `logitechVisionWebcam`; explicit 640-by-480
+  stream and matching calibration evidence; an official flat 6.5-inch fixed DECODE tag 20 or 24
+  with verified field identity/pose; powered Control Hub and Driver Station; deployment access; a
+  flat measured test area with marked official field axes; tape measure and angle tool; secure
+  stationary robot and tag; good lighting and complete tag visibility; adult supervision; a named
+  Driver Station STOP operator; and physically disconnected drive motors or an equivalently
+  reviewed movement-prevention method. Expected stationary field poses and acceptance tolerances
+  must be selected before results are viewed. This audit does not authorize deployment, physical
+  testing, localization-provider writes, alignment, or movement.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do
