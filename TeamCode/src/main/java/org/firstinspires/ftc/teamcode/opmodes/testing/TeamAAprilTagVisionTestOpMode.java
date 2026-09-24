@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmodes.testing;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagFieldPoseCandidate;
+import org.firstinspires.ftc.teamcode.common.localization.FieldPose;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservation;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservationSnapshot;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagPose;
@@ -74,6 +76,7 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
         publishLatchedPose();
         for (AprilTagObservation observation : observations) {
             telemetry.addData("Tag ID", observation.getTagId());
+            publishFieldPoseCandidate(observation);
             telemetry.addData("Pose Available", observation.isPoseAvailable());
             publishPrimaryPose("Camera", observation.getCameraRelativePose());
             publishPrimaryPose("Robot", observation.getRobotRelativePose());
@@ -95,6 +98,27 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
         }
         telemetry.update();
         previousObservations = observations;
+    }
+
+    private void publishFieldPoseCandidate(AprilTagObservation observation) {
+        telemetry.addData("Field Candidate Available",
+                observation.isFieldPoseCandidateAvailable());
+        telemetry.addData("Field Candidate Status", observation.getFieldPoseStatus());
+        AprilTagFieldPoseCandidate candidate = observation.getFieldPoseCandidate();
+        if (candidate == null) {
+            telemetry.addData("Field Candidate XYZ", "Unavailable");
+            telemetry.addData("Field Candidate PRY", "Unavailable");
+            return;
+        }
+        FieldPose pose = candidate.getFieldPose();
+        telemetry.addData("Field Candidate Frame", pose.getReferenceFrameName());
+        telemetry.addData("Field Candidate XYZ", "%.2f, %.2f, %.2f in",
+                pose.getXInches(), pose.getYInches(), pose.getZInches());
+        telemetry.addData("Field Candidate PRY", "%.2f, %.2f, %.2f deg",
+                pose.getPitchDegrees(), pose.getRollDegrees(), pose.getYawDegrees());
+        telemetry.addData("Field Candidate Age", "%.0f ms",
+                Math.max(0, System.nanoTime() - candidate.getAcquisitionTimestampNanos())
+                        / 1_000_000.0);
     }
 
     private void latchFirstFreshPose(AprilTagObservationSnapshot snapshot,

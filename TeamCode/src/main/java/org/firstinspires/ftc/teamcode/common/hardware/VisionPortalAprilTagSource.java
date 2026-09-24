@@ -6,7 +6,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagFieldPoseCandidate;
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagLocalizationConfiguration;
+import org.firstinspires.ftc.teamcode.common.localization.FieldPose;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservation;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservationSnapshot;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagPose;
@@ -33,18 +38,27 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
             "Experimental metric pose from fresh, calibrated, verified tag 22 data.";
     private static final String RETAINED_ID_ONLY_QUALITY =
             "Retained ID from last frame; metric pose requires a fresh frame.";
+    private static final String FIELD_POSE_ACCEPTED =
+            "Accepted fresh fixed-tag field-pose candidate; not a localization estimate.";
 
     private final AprilTagCameraConfiguration configuration;
+    private final AprilTagLocalizationConfiguration localizationConfiguration;
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
     private AprilTagObservationSnapshot snapshot = AprilTagObservationSnapshot.unavailable();
     private boolean available;
 
     VisionPortalAprilTagSource(AprilTagCameraConfiguration configuration) {
+        this(configuration, null);
+    }
+
+    VisionPortalAprilTagSource(AprilTagCameraConfiguration configuration,
+                               AprilTagLocalizationConfiguration localizationConfiguration) {
         if (configuration == null) {
             throw new IllegalArgumentException("Vision source needs a camera configuration.");
         }
         this.configuration = configuration;
+        this.localizationConfiguration = localizationConfiguration;
     }
 
     @Override
@@ -53,11 +67,20 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
         try {
             WebcamName webcam = hardwareMap.get(WebcamName.class,
                     configuration.getWebcamHardwareName());
-            aprilTagProcessor = new AprilTagProcessor.Builder()
+            AprilTagProcessor.Builder processorBuilder = new AprilTagProcessor.Builder()
                     .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
                     .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
-                    .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-                    .build();
+                    .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES);
+            if (canConfigureSdkCameraPose()) {
+                processorBuilder.setCameraPose(
+                        new Position(DistanceUnit.INCH,
+                                configuration.getMountRightInches(),
+                                configuration.getMountForwardInches(),
+                                configuration.getMountUpInches(), 0),
+                        new YawPitchRollAngles(AngleUnit.DEGREES,
+                                0, -90, 0, 0));
+            }
+            aprilTagProcessor = processorBuilder.build();
             visionPortal = new VisionPortal.Builder()
                     .setCamera(webcam)
                     .setCameraResolution(new Size(
@@ -94,6 +117,17 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
     }
 
     private AprilTagObservation createFreshObservation(AprilTagDetection detection) {
+        AprilTagObservation relativeObservation = createRelativeObservation(detection);
+        FieldPoseCandidateResult fieldResult = createFieldPoseCandidate(detection);
+        return new AprilTagObservation(relativeObservation.getTagId(),
+                relativeObservation.getTimestampNanos(),
+                relativeObservation.getQualityStatus(),
+                relativeObservation.getCameraRelativePose(),
+                relativeObservation.getRobotRelativePose(),
+                fieldResult.candidate, fieldResult.status);
+    }
+
+    private AprilTagObservation createRelativeObservation(AprilTagDetection detection) {
         String unavailableReason = getPoseUnavailableReason(detection);
         if (unavailableReason != null) {
             return new AprilTagObservation(detection.id, detection.frameAcquisitionNanoTime,
@@ -124,6 +158,82 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
                 robotRange, robotBearing, robotElevation);
         return new AprilTagObservation(detection.id, detection.frameAcquisitionNanoTime,
                 METRIC_QUALITY, cameraPose, robotPose);
+    }
+
+    private FieldPoseCandidateResult createFieldPoseCandidate(AprilTagDetection detection) {
+        String rejectionReason = getFieldPoseRejectionReason(detection);
+        if (rejectionReason != null) {
+            return FieldPoseCandidateResult.rejected(rejectionReason);
+        }
+
+        Position robotPosition = detection.robotPose.getPosition();
+        FieldPose fieldPose = new FieldPose(localizationConfiguration.getFieldFrameName(),
+                robotPosition.x, robotPosition.y, robotPosition.z,
+                detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES),
+                detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES),
+                detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES));
+        return FieldPoseCandidateResult.accepted(new AprilTagFieldPoseCandidate(
+                detection.id, detection.frameAcquisitionNanoTime, fieldPose));
+    }
+
+    private String getFieldPoseRejectionReason(AprilTagDetection detection) {
+        if (localizationConfiguration == null) {
+            return "Rejected: no fixed-tag localization configuration is selected.";
+        }
+        if (detection.frameAcquisitionNanoTime <= 0) {
+            return "Rejected: frame acquisition timestamp is invalid.";
+        }
+        long ageNanos = System.nanoTime() - detection.frameAcquisitionNanoTime;
+        if (ageNanos < 0 || ageNanos > localizationConfiguration.getMaxCandidateAgeNanos()) {
+            return "Rejected: fresh detection is older than the configured candidate limit.";
+        }
+        if (!localizationConfiguration.allowsTagId(detection.id)) {
+            return "Rejected: tag is not a configured fixed-field localization tag.";
+        }
+        if (!hasVerifiedFixedTagMetadata(detection)) {
+            return "Rejected: fixed-tag metadata is missing or does not match the SDK entry.";
+        }
+        if (!configuration.isCalibrationVerified()
+                || configuration.getStreamWidth() != 640
+                || configuration.getStreamHeight() != 480) {
+            return "Rejected: matching C920 640-by-480 calibration is not verified.";
+        }
+        if (!canConfigureSdkCameraPose()) {
+            return "Rejected: the verified camera mount cannot be supplied to the SDK.";
+        }
+        if (detection.robotPose == null) {
+            return "Rejected: the FTC processor supplied no robot field pose.";
+        }
+        Position position = detection.robotPose.getPosition();
+        double pitch = detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES);
+        double roll = detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES);
+        double yaw = detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES);
+        if (position == null || !allFinite(position.x, position.y, position.z,
+                pitch, roll, yaw)) {
+            return "Rejected: the FTC robot field pose contains a non-finite value.";
+        }
+        return null;
+    }
+
+    private boolean hasVerifiedFixedTagMetadata(AprilTagDetection detection) {
+        AprilTagMetadata metadata = detection.metadata;
+        if (metadata == null || metadata.id != detection.id || metadata.distanceUnit == null
+                || metadata.fieldPosition == null || metadata.fieldOrientation == null) {
+            return false;
+        }
+        String expectedName = detection.id == 20 ? "BlueTarget"
+                : detection.id == 24 ? "RedTarget" : "";
+        double tagSizeInches = DistanceUnit.INCH.fromUnit(
+                metadata.distanceUnit, metadata.tagsize);
+        return expectedName.equals(metadata.name) && isFinite(tagSizeInches)
+                && Math.abs(tagSizeInches - VERIFIED_TAG_SIZE_INCHES) <= COMPARISON_TOLERANCE;
+    }
+
+    private boolean canConfigureSdkCameraPose() {
+        return localizationConfiguration != null && configuration.isMountVerified()
+                && isZero(configuration.getMountYawDegrees())
+                && isZero(configuration.getMountPitchDegrees())
+                && isZero(configuration.getMountRollDegrees());
     }
 
     private String getPoseUnavailableReason(AprilTagDetection detection) {
@@ -193,7 +303,9 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
         List<AprilTagObservation> retained = new ArrayList<>();
         for (AprilTagObservation observation : previousObservations) {
             retained.add(new AprilTagObservation(observation.getTagId(),
-                    observation.getTimestampNanos(), RETAINED_ID_ONLY_QUALITY));
+                    observation.getTimestampNanos(), RETAINED_ID_ONLY_QUALITY,
+                    null, null, null,
+                    "Rejected: snapshot is retained rather than a fresh camera frame."));
         }
         return retained;
     }
@@ -211,4 +323,22 @@ class VisionPortalAprilTagSource implements AprilTagVisionSource {
 
     @Override public boolean isAvailable() { return available; }
     @Override public AprilTagObservationSnapshot getSnapshot() { return snapshot; }
+
+    private static final class FieldPoseCandidateResult {
+        private final AprilTagFieldPoseCandidate candidate;
+        private final String status;
+
+        private FieldPoseCandidateResult(AprilTagFieldPoseCandidate candidate, String status) {
+            this.candidate = candidate;
+            this.status = status;
+        }
+
+        private static FieldPoseCandidateResult accepted(AprilTagFieldPoseCandidate candidate) {
+            return new FieldPoseCandidateResult(candidate, FIELD_POSE_ACCEPTED);
+        }
+
+        private static FieldPoseCandidateResult rejected(String reason) {
+            return new FieldPoseCandidateResult(null, reason);
+        }
+    }
 }

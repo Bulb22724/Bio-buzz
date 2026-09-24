@@ -273,6 +273,18 @@ PVI-FTC | Editable master guide
   timestamps, and non-positive age limits. These types do not yet connect to VisionPortal or create
   live candidates; no localization estimate, fusion, alignment, autonomous, or motor behavior was
   added.
+- LA-04 connects the reviewed DECODE configuration to the separate Team A stationary diagnostic.
+  The hardware source supplies the verified +6.875-inch right, +4.875-inch forward, +19-inch up
+  camera position and the SDK's forward-camera yaw 0, pitch -90, roll 0 orientation through
+  `AprilTagProcessor.Builder.setCameraPose(...)`. Fresh tag 20/24 detections can expose one
+  immutable neutral field-pose candidate copied from SDK `robotPose` only when the acquisition age
+  is at most 250 milliseconds and fixed-tag metadata, C920 640-by-480 calibration, mount, SDK pose,
+  and finite-value gates pass. Every failure has an explicit status; retained snapshots strip the
+  candidate and report that the frame is retained. The stationary diagnostic displays candidate
+  availability, status, field frame, XYZ, pitch/roll/yaw, and age. Existing tag-22 experimental
+  camera/robot-relative behavior remains separate and unchanged. No estimator, stored robot pose,
+  odometry/Pedro write, fusion, alignment, autonomous, drivetrain, Limelight, or motor behavior was
+  added.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do
@@ -334,7 +346,9 @@ PVI-FTC | Editable master guide
   - `initialize(HardwareMap)`, `forward(double)`, `reverse(double)`, `stop()`, and `isAvailable()`
 - `org.firstinspires.ftc.teamcode.common.hardware.VisionHardware`
   - `VisionHardware()`, `VisionHardware(String)`,
-    `VisionHardware(AprilTagCameraConfiguration)`, `initialize()`, `initialize(HardwareMap)`,
+    `VisionHardware(AprilTagCameraConfiguration)`,
+    `VisionHardware(AprilTagCameraConfiguration, AprilTagLocalizationConfiguration)`,
+    `initialize()`, `initialize(HardwareMap)`,
     `update()`, `stop()`, `isAvailable()`, and
     `getObservations()`; `getSnapshot()` exposes the neutral frame status with the immutable list
 - `org.firstinspires.ftc.teamcode.common.hardware.AprilTagCameraConfiguration`
@@ -343,7 +357,9 @@ PVI-FTC | Editable master guide
 - `org.firstinspires.ftc.teamcode.common.vision.AprilTagObservation`
   - immutable neutral tag ID, timestamp, pose-availability, reference-frame, quality, position,
     orientation, range, bearing, and elevation getters; optional `getCameraRelativePose()` and
-    `getRobotRelativePose()` views; unavailable legacy robot metric values are `NaN`
+    `getRobotRelativePose()` views; optional `getFieldPoseCandidate()`,
+    `isFieldPoseCandidateAvailable()`, and explicit `getFieldPoseStatus()`; unavailable legacy
+    robot metric values are `NaN`
 - `org.firstinspires.ftc.teamcode.common.vision.AprilTagPose`
   - immutable finite position, orientation, range, bearing, and elevation values in one named
     neutral reference frame

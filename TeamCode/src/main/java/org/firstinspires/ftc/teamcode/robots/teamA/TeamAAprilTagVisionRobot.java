@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.common.hardware.AprilTagCameraConfiguration;
 import org.firstinspires.ftc.teamcode.common.hardware.VisionHardware;
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagLocalizationConfiguration;
 import org.firstinspires.ftc.teamcode.common.subsystems.vision.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservation;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservationSnapshot;
@@ -32,7 +33,8 @@ public class TeamAAprilTagVisionRobot extends Robot {
                 true, true, ROBOT_FRAME_NAME,
                 CAMERA_RIGHT_INCHES, CAMERA_FORWARD_INCHES, CAMERA_UP_INCHES,
                 0, 0, 0);
-        visionHardware = new VisionHardware(configuration);
+        visionHardware = new VisionHardware(
+                configuration, AprilTagLocalizationConfiguration.decodeGoalTags());
         visionSubsystem = new VisionSubsystem(visionHardware);
         registerSubsystem(visionSubsystem);
     }

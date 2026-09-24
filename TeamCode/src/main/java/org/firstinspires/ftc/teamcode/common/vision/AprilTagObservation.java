@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.common.vision;
 
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagFieldPoseCandidate;
+
 /**
  * Immutable AprilTag observation that does not expose an FTC or Limelight type.
  *
@@ -16,23 +18,43 @@ public final class AprilTagObservation {
     private final String qualityStatus;
     private final AprilTagPose cameraRelativePose;
     private final AprilTagPose robotRelativePose;
+    private final AprilTagFieldPoseCandidate fieldPoseCandidate;
+    private final String fieldPoseStatus;
+
+    private static final String NO_FIELD_POSE_STATUS =
+            "Field-pose candidate was not requested for this observation.";
 
     /** Creates an ID-only observation with no metric pose. */
     public AprilTagObservation(int tagId, long timestampNanos, String qualityStatus) {
-        this(tagId, timestampNanos, qualityStatus, null, null);
+        this(tagId, timestampNanos, qualityStatus, null, null, null, NO_FIELD_POSE_STATUS);
     }
 
     /** Creates an observation with camera-relative and robot-relative pose views. */
     public AprilTagObservation(int tagId, long timestampNanos, String qualityStatus,
                                AprilTagPose cameraRelativePose,
                                AprilTagPose robotRelativePose) {
+        this(tagId, timestampNanos, qualityStatus, cameraRelativePose, robotRelativePose,
+                null, NO_FIELD_POSE_STATUS);
+    }
+
+    /** Creates an observation with optional relative poses and one field-pose candidate result. */
+    public AprilTagObservation(int tagId, long timestampNanos, String qualityStatus,
+                               AprilTagPose cameraRelativePose,
+                               AprilTagPose robotRelativePose,
+                               AprilTagFieldPoseCandidate fieldPoseCandidate,
+                               String fieldPoseStatus) {
         validateIdentity(tagId, timestampNanos, qualityStatus);
+        if (fieldPoseStatus == null || fieldPoseStatus.isEmpty()) {
+            throw new IllegalArgumentException("Observation needs a field-pose status.");
+        }
 
         this.tagId = tagId;
         this.timestampNanos = timestampNanos;
         this.qualityStatus = qualityStatus;
         this.cameraRelativePose = cameraRelativePose;
         this.robotRelativePose = robotRelativePose;
+        this.fieldPoseCandidate = fieldPoseCandidate;
+        this.fieldPoseStatus = fieldPoseStatus;
     }
 
     /** Creates a legacy observation whose metric getters describe one robot-relative pose. */
@@ -67,6 +89,9 @@ public final class AprilTagObservation {
     public boolean isRobotRelativePoseAvailable() { return robotRelativePose != null; }
     public AprilTagPose getCameraRelativePose() { return cameraRelativePose; }
     public AprilTagPose getRobotRelativePose() { return robotRelativePose; }
+    public boolean isFieldPoseCandidateAvailable() { return fieldPoseCandidate != null; }
+    public AprilTagFieldPoseCandidate getFieldPoseCandidate() { return fieldPoseCandidate; }
+    public String getFieldPoseStatus() { return fieldPoseStatus; }
     public String getReferenceFrameName() {
         return robotRelativePose == null
                 ? "Unverified robot frame"

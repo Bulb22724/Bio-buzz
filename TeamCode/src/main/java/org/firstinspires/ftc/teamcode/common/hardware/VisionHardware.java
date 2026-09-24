@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.common.hardware;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.teamcode.common.localization.AprilTagLocalizationConfiguration;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservation;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagObservationSnapshot;
 
@@ -33,6 +34,12 @@ public class VisionHardware {
     /** Creates VisionPortal AprilTag hardware from reviewed camera and mount facts. */
     public VisionHardware(AprilTagCameraConfiguration configuration) {
         this(new VisionPortalAprilTagSource(configuration));
+    }
+
+    /** Creates VisionPortal hardware with reviewed camera facts and fixed-tag candidate rules. */
+    public VisionHardware(AprilTagCameraConfiguration cameraConfiguration,
+                          AprilTagLocalizationConfiguration localizationConfiguration) {
+        this(new VisionPortalAprilTagSource(cameraConfiguration, localizationConfiguration));
     }
 
     /** Allows a hardware-layer source to be supplied by a later vision composition. */
