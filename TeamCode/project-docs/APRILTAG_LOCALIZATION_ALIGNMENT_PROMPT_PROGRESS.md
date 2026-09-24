@@ -26,7 +26,7 @@ Working branch: `codex/Vision`
 | Prompt | Status | Review date | Durable evidence or decision |
 | --- | --- | --- | --- |
 | LA-01 | Reviewed | 2026-09-24 | Student accepted the repository/SDK 11.2.1 and official-guidance evidence. Stage 5 will use fixed DECODE GOAL tags 20 and 24 through a replaceable season configuration, the official FTC field coordinate system, and independent fresh field-pose candidates rather than a maintained estimate. Candidates require a `FRESH` snapshot, age at most 250 ms, verified fixed-tag metadata, matching calibration, verified mount, and finite pose; failures expose a rejection reason. Pedro/odometry fusion, BIOBUZZ SDK 12 migration, alignment control, and autonomous integration remain deferred. DECODE tags 21-23 and moving BIOBUZZ tags are not absolute-localization references. No production code changed; JDK 17 baseline passed. |
-| LA-02 | Not started | — | — |
+| LA-02 | Reviewed | 2026-09-24 | Student accepted the Stage 5 design recorded in `APRILTAG_VISION_ARCHITECTURE_DECISION.md`: official FTC field coordinates; replaceable DECODE fixed-GOAL tag 20/24 configuration; SDK 11.2.1 `setCameraPose`/`robotPose` below hardware; optional candidate plus separate status on each immutable observation; and neutral `FieldPose`, `AprilTagFieldPoseCandidate`, and `AprilTagLocalizationConfiguration` classes. The unchanged forward camera remains neutral mount rotation 0/0/0 and maps to SDK camera yaw 0, pitch -90, roll 0. Candidate gates produce an accepted value or explicit rejection. Pedro, BIOBUZZ SDK 12, fusion, alignment, autonomous, Limelight, and motors remain deferred. Builds and diff check passed. |
 | LA-03 | Not started | — | — |
 | LA-04 | Not started | — | — |
 | LA-05 | Not started | — | — |
