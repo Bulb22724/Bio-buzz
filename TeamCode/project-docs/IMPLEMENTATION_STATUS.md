@@ -226,6 +226,36 @@ PVI-FTC | Editable master guide
   top of the Driver Station list. The observations remain experimental; localization and
   alignment remain unauthorized while the range bias and position sensitivity are unresolved or
   unaccepted.
+- C920 calibration investigation on 2026-09-18 added a separate
+  `Team A Camera Calibration Capture` testing OpMode, `TeamACameraCalibrationRobot`, and
+  `CameraFrameCaptureHardware`.
+  The capture-only hardware wrapper requests the configured `logitechVisionWebcam` at 640 by 480,
+  accepts one raw-frame save request on each gamepad X press only while streaming, and closes the
+  VisionPortal on STOP. INIT telemetry refreshes camera state as it opens; telemetry labels
+  requests rather than claiming that files were saved.
+  The TeamCode Java 17 build passed. No AprilTag processor, camera calibration, mount value,
+  localization, alignment, or motor behavior changed. Ten 640-by-480 images were subsequently
+  captured and processed with 3DF Zephyr. Its 0.207046-pixel mean square reprojection error was
+  internally encouraging, but the exported camera metadata was incomplete and its focal length
+  differed materially from the FTC SDK's built-in C920 calibration. The Zephyr calibration was
+  therefore not adopted.
+- The stationary AprilTag diagnostic now latches the first fresh camera and robot range/bearing
+  after each START and displays that one sample until STOP. It is labeled `Latched First Fresh`,
+  `display only`, and shows increasing age so it cannot be mistaken for live data. This OpMode-only
+  display latch does not change neutral snapshot freshness, restore retained metric pose, correct
+  measurements, or feed localization or movement. Each new measurement requires a new OpMode run.
+- Corrected stationary validation on 2026-09-22 and 2026-09-23 found that the laser distance meter
+  used for the earlier MV-06 measurements reported 36.95 inches over a tape-measured 33.00-inch
+  span. The earlier approximately 3-inch low-bias conclusion is retained above as historical MV-06
+  evidence but is not a valid camera-calibration conclusion. New camera-centered tests measured
+  lens-plane-to-tag-plane distance with a tape measure and recorded three independent latched runs
+  at 33, 48, and 66 inches. Mean camera ranges were 33.46, 48.41, and 66.19 inches, for errors of
+  +0.46, +0.41, and +0.19 inches. Mean transformed robot ranges were 38.86, 53.84, and 71.57 inches,
+  compared with expected values of 38.49, 53.32, and 71.21 inches from the recorded camera mount.
+  The results were repeatable and do not justify the Zephyr calibration, a constant range offset,
+  or another software correction. Bearing was repeatable but reflected small physical centering
+  offsets, so these measurements remain experimental. Localization, automatic alignment, and
+  motor behavior remain unauthorized and unimplemented.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do

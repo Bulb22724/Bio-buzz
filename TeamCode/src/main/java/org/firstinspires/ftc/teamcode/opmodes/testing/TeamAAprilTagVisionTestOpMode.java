@@ -20,9 +20,17 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
     private List<AprilTagObservation> previousObservations = Collections.emptyList();
     private int retainedTimestampChecks;
     private int retainedTimestampFailures;
+    private int latchedTagId = -1;
+    private long latchedTimestampNanos;
+    private AprilTagPose latchedCameraPose;
+    private AprilTagPose latchedRobotPose;
 
     @Override
     public void init() {
+        latchedTagId = -1;
+        latchedTimestampNanos = 0;
+        latchedCameraPose = null;
+        latchedRobotPose = null;
         robot = new TeamAAprilTagVisionRobot(WEBCAM_HARDWARE_NAME);
         robot.initialize(hardwareMap);
         telemetry.addData("Status", "AprilTag pilot initialized");
@@ -49,6 +57,7 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
 
     private void publishObservations(AprilTagObservationSnapshot snapshot) {
         List<AprilTagObservation> observations = snapshot.getObservations();
+        latchFirstFreshPose(snapshot, observations);
         String retainedTimestampResult = "Not checked this loop";
         if (snapshot.isRetained() && !observations.isEmpty()) {
             retainedTimestampChecks++;
@@ -62,6 +71,7 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
 
         telemetry.addData("Frame Status", snapshot.getFrameStatus());
         telemetry.addData("Detection Count", observations.size());
+        publishLatchedPose();
         for (AprilTagObservation observation : observations) {
             telemetry.addData("Tag ID", observation.getTagId());
             telemetry.addData("Pose Available", observation.isPoseAvailable());
@@ -85,6 +95,38 @@ public class TeamAAprilTagVisionTestOpMode extends OpMode {
         }
         telemetry.update();
         previousObservations = observations;
+    }
+
+    private void latchFirstFreshPose(AprilTagObservationSnapshot snapshot,
+                                     List<AprilTagObservation> observations) {
+        if (latchedTimestampNanos != 0 || !snapshot.isFreshFrame()) {
+            return;
+        }
+        for (AprilTagObservation observation : observations) {
+            if (observation.isCameraRelativePoseAvailable()
+                    && observation.isRobotRelativePoseAvailable()) {
+                latchedTagId = observation.getTagId();
+                latchedTimestampNanos = observation.getTimestampNanos();
+                latchedCameraPose = observation.getCameraRelativePose();
+                latchedRobotPose = observation.getRobotRelativePose();
+                return;
+            }
+        }
+    }
+
+    private void publishLatchedPose() {
+        if (latchedTimestampNanos == 0) {
+            telemetry.addData("Latched First Fresh", "Waiting");
+            return;
+        }
+        double ageMillis = Math.max(0,
+                System.nanoTime() - latchedTimestampNanos) / 1_000_000.0;
+        telemetry.addData("Latched First Fresh", "Tag %d; display only", latchedTagId);
+        telemetry.addData("Latched Camera", "%.2f in / %.2f deg",
+                latchedCameraPose.getRangeInches(), latchedCameraPose.getBearingDegrees());
+        telemetry.addData("Latched Robot", "%.2f in / %.2f deg",
+                latchedRobotPose.getRangeInches(), latchedRobotPose.getBearingDegrees());
+        telemetry.addData("Latched Age", "%.0f ms", ageMillis);
     }
 
     private void publishPrimaryPose(String label, AprilTagPose pose) {
