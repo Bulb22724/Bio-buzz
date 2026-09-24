@@ -263,6 +263,16 @@ PVI-FTC | Editable master guide
   stationary localization, raised-wheel alignment, and low-speed floor alignment. This is planning
   only; no field-pose, localization, alignment, drivetrain, autonomous, Limelight, or motor behavior
   was added.
+- LA-03 verified the checked-out SDK 11.2.1 DECODE library directly: fixed `BlueTarget` tag 20 and
+  fixed `RedTarget` tag 24 are 6.5-inch tags with field position and orientation metadata, while
+  OBELISK tags 21 through 23 have no field position or orientation. Added neutral immutable
+  `FieldPose`, `AprilTagFieldPoseCandidate`, and `AprilTagLocalizationConfiguration` value types.
+  The reviewed DECODE configuration allows only tags 20 and 24 in the named official FTC field
+  frame and defensively stores its tag IDs with a 250-millisecond maximum candidate age. Constructor
+  validation rejects missing names/poses, non-finite pose values, invalid or duplicate IDs, invalid
+  timestamps, and non-positive age limits. These types do not yet connect to VisionPortal or create
+  live candidates; no localization estimate, fusion, alignment, autonomous, or motor behavior was
+  added.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do
@@ -337,6 +347,13 @@ PVI-FTC | Editable master guide
 - `org.firstinspires.ftc.teamcode.common.vision.AprilTagPose`
   - immutable finite position, orientation, range, bearing, and elevation values in one named
     neutral reference frame
+- `org.firstinspires.ftc.teamcode.common.localization.FieldPose`
+  - immutable finite X/Y/Z and pitch/roll/yaw values in one named field reference frame
+- `org.firstinspires.ftc.teamcode.common.localization.AprilTagFieldPoseCandidate`
+  - one immutable accepted tag ID, positive acquisition timestamp, and neutral `FieldPose`
+- `org.firstinspires.ftc.teamcode.common.localization.AprilTagLocalizationConfiguration`
+  - immutable configuration name, defensive fixed-tag ID list, field-frame name, maximum candidate
+    age, `allowsTagId(int)`, and the reviewed `decodeGoalTags()` factory
 - `org.firstinspires.ftc.teamcode.common.vision.AprilTagFrameStatus` and
   `AprilTagObservationSnapshot`
   - neutral `FRESH`, `RETAINED`, and `UNAVAILABLE` frame status; immutable observation list;
