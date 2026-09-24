@@ -305,6 +305,13 @@ PVI-FTC | Editable master guide
   reviewed movement-prevention method. Expected stationary field poses and acceptance tolerances
   must be selected before results are viewed. This audit does not authorize deployment, physical
   testing, localization-provider writes, alignment, or movement.
+- LA-06 preparation added `APRILTAG_LOCALIZATION_FIELD_POSE_TEST_WORKSHEET.md`. Checked-out SDK
+  11.2.1 bytecode supplies tag 20 at (-58.3727, -55.6425, 29.5) inches with its official
+  orientation. The worksheet translates that entry into a marked-axis setup, the three preselected
+  expected robot poses, blank three-reading tables, error/spread calculations, freshness and
+  loss/reacquisition checks, and the complete prerequisite and STOP checklists. No physical result
+  is recorded: the team does not currently have access to a space that can reproduce the official
+  tag pose and field axes. Production code and prompt status remain unchanged.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do
