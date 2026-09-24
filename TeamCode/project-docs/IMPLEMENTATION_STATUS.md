@@ -256,6 +256,13 @@ PVI-FTC | Editable master guide
   or another software correction. Bearing was repeatable but reflected small physical centering
   offsets, so these measurements remain experimental. Localization, automatic alignment, and
   motor behavior remain unauthorized and unimplemented.
+- Stage 5 planning on 2026-09-24 added
+  `APRILTAG_LOCALIZATION_ALIGNMENT_STUDENT_GUIDE.md` and its branch-local prompt progress record.
+  LA-01 through LA-10 separate field-pose candidates from target-relative alignment, require pure
+  transform and rejection checks before physical validation, and place distinct STOP gates before
+  stationary localization, raised-wheel alignment, and low-speed floor alignment. This is planning
+  only; no field-pose, localization, alignment, drivetrain, autonomous, Limelight, or motor behavior
+  was added.
 - Completed Prompt 13: added non-blocking autonomous sequencing in `common.autonomous`:
   `AutoStep`, `AutoSequence`, `WaitStep`, `TimedDriveStep`, and `TimedIntakeStep`.
 - `AutoSequence` runs one step at a time. Empty sequences finish immediately; repeated starts do
