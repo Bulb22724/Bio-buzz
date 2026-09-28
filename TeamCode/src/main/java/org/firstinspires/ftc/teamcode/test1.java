@@ -13,7 +13,7 @@ public class test1 extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             testMotor.setPower(1);
-
+3
         }
     }
 }
