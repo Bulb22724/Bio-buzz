@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
 public class test1 {
-    int d = 2;
+    int d = 1000;
 }
