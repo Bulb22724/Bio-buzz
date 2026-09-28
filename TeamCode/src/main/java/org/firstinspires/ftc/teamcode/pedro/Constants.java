@@ -94,5 +94,4 @@ public class Constants {
                             c.naturalStrafeDeceleration.set(65.13648242339649);
                         }
                 );
-    );
 }

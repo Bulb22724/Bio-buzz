@@ -16,6 +16,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
+import org.firstinspires.ftc.teamcode.shooter.Shooter;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
 
@@ -32,6 +33,8 @@ public class RobotContainer extends Robot {
     private final List<LynxModule> hubs;
 
     private final Chassis chassis;
+
+    private final Shooter shooter;
 
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
@@ -54,8 +57,9 @@ public class RobotContainer extends Robot {
         }
 
         chassis = new Chassis(telemetry, hardwareMap);
+        shooter = new Shooter(telemetry, hardwareMap);
 
-        subsystems.addAll(List.of(chassis));
+        subsystems.addAll(List.of(chassis, shooter));
 
         for(Subsystem s : subsystems) {
             register(s);
