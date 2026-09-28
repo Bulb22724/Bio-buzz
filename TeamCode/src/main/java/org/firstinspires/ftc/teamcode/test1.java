@@ -10,4 +10,6 @@ public class test1 extends LinearOpMode{
     public void runOpMode() throws InterruptedException {
         testMotor = hardwareMap.get(DcMotor.class, "something");
     }
+public class test1 {
+    int d = 2000;
 }
