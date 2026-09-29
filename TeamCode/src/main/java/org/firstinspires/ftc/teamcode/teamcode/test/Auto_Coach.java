@@ -15,6 +15,7 @@ import org.firstinspires.ftc.teamcode.teamcode.mechanism.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -166,12 +167,15 @@ public class Auto_Coach extends LinearOpMode {
             telemetry.addLine("We have tags detected: " + detectedTags.size());
             sleep(5000);
             for (AprilTagDetection tag : detectedTags) {
-                telemetry.addData("tag.id: ", tag.id);
-                if (tag.id == GREEN_PURPLE_PURPLE_TAG_ID ||
-                        tag.id == PURPLE_GREEN_PURPLE_TAG_ID ||
-                        tag.id == PURPLE_PURPLE_GREEN_TAG_ID) {
-                    classificationTagId = tag.id;
-                    break;
+                if (tag instanceof AprilTagSingleDetection) {
+                    AprilTagSingleDetection singleTag = (AprilTagSingleDetection) tag;
+                    telemetry.addData("tag.id: ", singleTag.id);
+                    if (singleTag.id == GREEN_PURPLE_PURPLE_TAG_ID ||
+                            singleTag.id == PURPLE_GREEN_PURPLE_TAG_ID ||
+                            singleTag.id == PURPLE_PURPLE_GREEN_TAG_ID) {
+                        classificationTagId = singleTag.id;
+                        break;
+                    }
                 }
 
                 sleep(500);

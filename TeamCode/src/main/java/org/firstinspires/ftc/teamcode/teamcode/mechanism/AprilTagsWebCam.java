@@ -14,8 +14,10 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagClusterDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,14 +116,26 @@ public class AprilTagsWebCam {
             return;
         }
 
-        if (detection.metadata != null) {
-            telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-            telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-        } else {
-            telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-            telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+        if (detection instanceof AprilTagSingleDetection) {
+            AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
+            if (singleDet.metadata != null) {
+                telemetry.addLine(String.format("\n==== (ID %d) %s", singleDet.id, singleDet.metadata.name));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            } else {
+                telemetry.addLine(String.format("\n==== (ID %d) Unknown", singleDet.id));
+                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", singleDet.center.x, singleDet.center.y));
+            }
+        } else if (detection instanceof AprilTagClusterDetection) {
+            AprilTagClusterDetection clusterDet = (AprilTagClusterDetection) detection;
+            telemetry.addLine(String.format("\n==== Tag Cluster (%s)", clusterDet.metadata.name));
+            telemetry.addLine(String.format("Percent tags found: %d", clusterDet.percentClusterFound));
+            if (detection.ftcPose != null) {
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+            }
         }
     }
 
@@ -129,9 +143,12 @@ public class AprilTagsWebCam {
         List<AprilTagDetection> tags = aprilTagProcessor.getDetections();
 
         for (AprilTagDetection tag : tags) {
-            telemetry.addData("tag.id: ", tag.id);
-            if (tag.id == id) {
-                return tag;
+            if (tag instanceof AprilTagSingleDetection) {
+                AprilTagSingleDetection singleTag = (AprilTagSingleDetection) tag;
+                telemetry.addData("tag.id: ", singleTag.id);
+                if (singleTag.id == id) {
+                    return tag;
+                }
             }
         }
         return null;
@@ -195,11 +212,14 @@ public class AprilTagsWebCam {
 
             if (!currentDetections.isEmpty()) {
                 for (AprilTagDetection detection : currentDetections) {
-                    // Check if a known AprilTag ID is detected
-                    if (detection.id == KNOWN_APRILTAG_ID_1 || detection.id == KNOWN_APRILTAG_ID_2) { // Replace with your known IDs
-                        tagsFound = true;
-                        telemetry.addData("AprilTag Found", "ID: %d", detection.id);
-                        break; // Exit inner loop
+                    if (detection instanceof AprilTagSingleDetection) {
+                        AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
+                        // Check if a known AprilTag ID is detected
+                        if (singleDet.id == KNOWN_APRILTAG_ID_1 || singleDet.id == KNOWN_APRILTAG_ID_2) { // Replace with your known IDs
+                            tagsFound = true;
+                            telemetry.addData("AprilTag Found", "ID: %d", singleDet.id);
+                            break; // Exit inner loop
+                        }
                     }
                 }
             }
