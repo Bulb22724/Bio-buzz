@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
+import static org.firstinspires.ftc.teamcode.pedroPathing.Tuning.follower;
+
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import dev.nextftc.hardware.actuators.NextMotor;
@@ -23,7 +25,10 @@ public class Drivetrain implements Mechanism {
         backLeft.setZeroPowerBehavior(NextMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void startDrive(Gamepad gamepad) {
+    public void startMecanumDrive(Gamepad gamepad) {
         DriveCommands.mecanumDrive(frontLeft, frontRight, backLeft, backRight, gamepad).schedule();
+    }
+    public void startFieldCentricDrive(Gamepad gamepad){
+        DriveCommands.mecanumDriveFieldCentric(frontLeft,frontRight,backLeft,backRight, gamepad , () -> follower.getPose().getHeading()).schedule();
     }
 }

@@ -16,6 +16,6 @@ public class SimpleDrivingTeleOp extends NextOpMode {
 
     @Override
     public void start() {
-        robot.drivetrain.startDrive(gamepad1);
+        robot.drivetrain.startMecanumDrive(gamepad1);
     }
 }

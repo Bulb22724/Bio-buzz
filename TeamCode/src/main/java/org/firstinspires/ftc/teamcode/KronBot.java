@@ -18,10 +18,10 @@ public class KronBot implements NextRobot {
     public final Drivetrain drivetrain;
 
     public KronBot() {
-        frontLeft = new NextMotor(RobotController.controlHub(),2);
-        backLeft = new NextMotor(RobotController.controlHub(),1);
-        frontRight = new NextMotor(RobotController.controlHub(),3);
-        backRight = new NextMotor(RobotController.controlHub(),0);
+        frontLeft = new NextMotor(RobotController.controlHub(),0);
+        backLeft = new NextMotor(RobotController.controlHub(),2);
+        frontRight = new NextMotor(RobotController.controlHub(),1);
+        backRight = new NextMotor(RobotController.controlHub(),3);
 
         frontRight.setDirection(NextMotor.Direction.REVERSE);
         backRight.setDirection(NextMotor.Direction.REVERSE);
