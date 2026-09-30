@@ -190,4 +190,3 @@ do not enable alignment.
 - Overall result: PASS / FAIL / BLOCKED / STOPPED
 - Observed limitations: ________________________________________________________________
 - One testable hypothesis for any failure: ______________________________________________
-
