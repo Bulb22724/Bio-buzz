@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.mechanisms;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -10,11 +11,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class HardwareConfig {
 
+    //This is the main mechanism
+
     public DcMotor frontLeft;
     public DcMotor frontRight;
     public DcMotor backLeft;
     public DcMotor backRight;
-    public Servo pollenPusher;
+    public Servo pollenPusherServo;
+    public CRServo feederServo;
     public IMU imu;
 
     public void init(HardwareMap hardwareMap) {
@@ -22,18 +26,22 @@ public class HardwareConfig {
         frontRight = hardwareMap.get(DcMotor.class, "frontRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
         backRight = hardwareMap.get(DcMotor.class, "backRight");
-        pollenPusher = hardwareMap.get(Servo.class, "pollenPusher");
+        pollenPusherServo = hardwareMap.get(Servo.class, "pollenPusherServo");
+        feederServo = hardwareMap.get(CRServo.class, "feederServo");
         imu = hardwareMap.get(IMU.class, "imu");
 
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
+        pollenPusherServo.setDirection(Servo.Direction.REVERSE);
+        feederServo.setDirection(CRServo.Direction.REVERSE);
 
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
+        feederServo.setPower(0);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -52,6 +60,7 @@ public class HardwareConfig {
         imu.initialize(new IMU.Parameters(RevOrientation));
     }
 
+    //Added from MechanumCofig.java
     public void drive(double forward, double strafe, double rotate) {
         double frontLeftPower = forward + strafe + rotate;
         double backLeftPower = forward - strafe + rotate;
@@ -73,6 +82,7 @@ public class HardwareConfig {
         backRight.setPower(maxSpeed * (backRightPower / maxPower));
     }
 
+    //Added from MechanumCofig.java
     public void driveFieldRelative(double forward, double strafe, double rotate) {
         double theta = Math.atan2(forward, strafe);
         double r = Math.hypot(strafe, forward);
