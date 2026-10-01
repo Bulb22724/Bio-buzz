@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.practice;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.HardwareConfig;
+import org.firstinspires.ftc.teamcode.mechanisms.HardwareConfig;
 
 public class MechanumDrive extends OpMode {
 
