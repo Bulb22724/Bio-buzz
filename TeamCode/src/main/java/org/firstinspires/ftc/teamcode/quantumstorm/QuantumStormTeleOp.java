@@ -35,6 +35,9 @@ public class QuantumStormTeleOp extends LinearOpMode {
     private boolean previousA = false;
     private boolean previousB = false;
 
+    // For shooter speed
+    private float shooterSpeed = Constants.SHOOTER_POWER;
+
     @Override
     public void runOpMode() {
 
@@ -106,6 +109,8 @@ public class QuantumStormTeleOp extends LinearOpMode {
         telemetry.addLine("");
 
         telemetry.addLine("GAMEPAD 2 - SHOOTER");
+        telemetry.addLine("A = Shooter Speed Down");
+        telemetry.addLine("B = Shooter Speed Up");
         telemetry.addLine("Y = Shooter ON");
         telemetry.addLine("X = Shooter OFF");
         telemetry.addLine("D-Pad UP = Shooter Forward");
@@ -200,10 +205,27 @@ public class QuantumStormTeleOp extends LinearOpMode {
                 shooterRunning = false;
             }
 
+            // A = shooter speed down
+            if (gamepad2.a) {
+                shooterSpeed = shooterSpeed - 0.1;
+                if (shooterSpeed < -1.0) {
+                    shooterSpeed = -1.0;
+                }
+            }
+
+            // B = shooter speed up
+            if (gamepad2.b) {
+                shooterSpeed = shooterSpeed + 0.1;
+                if (shooterSpeed > 1.0) {
+                    shooterSpeed = 1.0;
+                }
+            }
+
+
 
             if (shooterRunning) {
 
-                shooter.setPower(Constants.SHOOTER_POWER);
+                shooter.setPower(shooterSpeed);
 
             } else {
 
@@ -274,7 +296,7 @@ public class QuantumStormTeleOp extends LinearOpMode {
                 telemetry.addData(
                         "Shooter",
                         "RUNNING @ %.0f%%",
-                        Constants.SHOOTER_POWER * 100);
+                        shooterSpeed * 100);
 
             } else {
 
