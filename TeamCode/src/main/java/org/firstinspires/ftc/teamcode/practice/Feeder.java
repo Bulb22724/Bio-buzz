@@ -2,17 +2,12 @@ package org.firstinspires.ftc.teamcode.practice;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.teamcode.mechanisms.HardwareConfig;
 
-@TeleOp(name = "Mecahanum Drive Field Oriented")
-public class MechanumDrive extends OpMode {
-
+@TeleOp(name = "Feeder Test")
+public class Feeder extends OpMode {
     HardwareConfig config = new HardwareConfig();
 
-    double forward;
-    double strafe;
-    double rotate;
 
     @Override
     public void init() {
@@ -21,10 +16,12 @@ public class MechanumDrive extends OpMode {
 
     @Override
     public void loop() {
-        forward = gamepad1.right_stick_y;
-        strafe = gamepad1.right_stick_x;
-        rotate = gamepad1.left_stick_x;
+        if (gamepad1.dpad_up){
+            config.feederServo.setPower(0.3);
+        }
 
-        config.driveFieldRelative(forward, strafe, rotate);
+        if (gamepad1.dpad_down){
+            config.feederServo.setPower(-0.3);
+        }
     }
 }
