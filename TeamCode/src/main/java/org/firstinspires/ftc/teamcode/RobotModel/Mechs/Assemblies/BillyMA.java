@@ -18,7 +18,13 @@ public class BillyMA extends MechAssembly {
         void execute(BillyMA mechAssembly, Gamepad gamepad);
     }
 
-
+    public enum Part {
+        INTAKE,
+        PUSHER,
+        FLYWHEEL,
+        TURRET
+    }
+    
     private final SpinnyIntake intake;
     private final PusherServo ballPusher;
     private final DoubleShooter flywheel;
