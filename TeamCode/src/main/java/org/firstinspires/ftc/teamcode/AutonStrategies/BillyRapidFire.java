@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.RobotModel.Mechs.Assemblies.BillyMA;
  * reporting now goes through {@code mechAssembly.reportStatus/reportData} so the
  * single-flush rule in {@code Robot.updateTelemetry()} is respected.
  */
-public class BillyRapidFire extends StateMachine
+public class BillyRapidFire extends StateMachine implements IState
 {
     private final BillyMA.AutonomousBillyMA mechAssembly;
     private int ballCount;
@@ -35,7 +35,7 @@ public class BillyRapidFire extends StateMachine
     public void reset(int ballCount)
     {
         this.ballCount = ballCount;
-        currentState = startShooter();
+        //currentState = startShooter();
     }
 
 
