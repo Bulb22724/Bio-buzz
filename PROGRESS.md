@@ -18,3 +18,14 @@
 - Tag detection range with 4/2/1 3.6in tags (in):
 ## Problems and fixes
 - (date) problem --> fix 
+# Quick GIT reference
+
+| Scenario                                   | Command                                          |
+|--------------------------------------------|--------------------------------------------------|
+| File broken, last version needed           | git restore path/to/file.java                    |
+| Weekly progress check                      | git log --oneline --graph --all                  |
+| When did a tuned value change              | git log -p path/to/constants.java                |
+| Undo a commit already pushed               | git revert <commit-id>                           |
+| Put unfinished work aside to switch branch | git stash; later git stash pop                   |
+| see code as it was at the end of day x     | git switch --detach dayX-done; git switch master |
+| which days are done                        | git tag                                          |
