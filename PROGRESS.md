@@ -1,16 +1,16 @@
 # FTC Vision Progress Tracker
-| Day  | Date | Core | Stretch | Notes |
-|------|------|------|---------|-------|
-| I    | 10/1 |      |         |       |
-| II   |      |      |         |       |
-| III  |      |      |         |       |
-| IV   |      |      |         |       |
-| V    |      |      |         |       |
-| VI   |      |      |         |       |
-| VII  |      |      |         |       |
-| VIII |      |      |         |       |
-| IX   |      |      |         |       |
-| X    |      |      |         |       |
+| Day  | Date | Core | Stretch | Notes                   |
+|------|------|------|---------|-------------------------|
+| I    | 10/1 | X    |         | need to find camera FOV |
+| II   |      |      |         |                         |
+| III  |      |      |         |                         |
+| IV   |      |      |         |                         |
+| V    |      |      |         |                         |
+| VI   |      |      |         |                         |
+| VII  |      |      |         |                         |
+| VIII |      |      |         |                         |
+| IX   |      |      |         |                         |
+| X    |      |      |         |                         |
 # Measured Values
 - Camera, resolution: Logitech C720 "Webcam 1", 640x480
 - Camera height (in), pitch (deg), offset from robot center (X/Y) in: 
