@@ -3,6 +3,12 @@ package org.firstinspires.ftc.teamcode.AutonStrategies;
 
 import org.firstinspires.ftc.teamcode.Extensions.IState;
 import org.firstinspires.ftc.teamcode.RobotModel.Mechs.Assemblies.BillyMA;
+import org.firstinspires.ftc.teamcode.RobotModel.Mechs.Assemblies.MechAssembly;
+
+import com.qualcomm.robotcore.hardware.Gamepad;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 
 /**
@@ -14,9 +20,11 @@ import org.firstinspires.ftc.teamcode.RobotModel.Mechs.Assemblies.BillyMA;
  * reporting now goes through {@code mechAssembly.reportStatus/reportData} so the
  * single-flush rule in {@code Robot.updateTelemetry()} is respected.
  */
-public class BillyRapidFire extends StateMachine implements IState
+public class BillyRapidFire extends StateMachine
+        implements MechAssembly.IMacroAssemblyStrategy<BillyMA.Part>
 {
     private final BillyMA.AutonomousBillyMA mechAssembly;
+    private final int shotsPerRun;
     private int ballCount;
 
     /**
@@ -29,13 +37,39 @@ public class BillyRapidFire extends StateMachine implements IState
     public BillyRapidFire(BillyMA.AutonomousBillyMA ma, int ballCount)
     {
         mechAssembly = ma;
-        reset(ballCount);
+        shotsPerRun = ballCount;
+    }
+
+    @Override
+    public Set<BillyMA.Part> claims()
+    {
+        return EnumSet.of(BillyMA.Part.PUSHER, BillyMA.Part.FLYWHEEL);
+    }
+
+    @Override
+    public void start()
+    {
+        reset(shotsPerRun);
+    }
+
+    @Override
+    public void update(Gamepad gamepad)
+    {
+        updateState();
+    }
+
+    @Override
+    public void cancel()
+    {
+        abort();
+        mechAssembly.autonFlywheel.StopShoot();
+        mechAssembly.autonBallPusher.retractPusher();
     }
 
     public void reset(int ballCount)
     {
         this.ballCount = ballCount;
-        //currentState = startShooter();
+        currentState = startShooter();
     }
 
 
