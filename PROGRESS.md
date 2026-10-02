@@ -16,7 +16,16 @@
 - Camera height (in), pitch (deg), offset from robot center (X/Y) in: 
 - Horizontal FOV (deg), fx (pixels):
 - Tag detection range with 4/2/1 3.6in tags (in):
-- Wheel motor names: CH: rf 0; rb 1; claw 2; elevator 3 EH: lf 0; lb 1
+- Motor Determinations
+| Name  | ID  | Type               |
+|-------|-----|--------------------|
+| RF    | 0   | Rev 20:1 Hex       |
+| RB    | 1   |                    |
+| Claw  | 2   | Rev Core Hex       |
+| Elev. | 3   | Rev UltraPlan  Hex |
+| LF    | EH0 | Rev 20:1 Hex       |
+| LB    | EH1 | Rev 20:1 Hex       |
+
 ## Problems and fixes
 - (date) problem --> fix 
 # Quick GIT reference
