@@ -110,30 +110,11 @@ public class BillyMA extends MechAssembly {
                 });
         this.telemetry = tel;
 
-        // TODO: everything from here to the end of the constructor is dead - and worse,
-        //  it builds objects that are quietly broken. Each component only creates its
-        //  own autonomous-behaviors object inside initializeTelemetry(), so at this
-        //  point all four getAutonomousBehaviors() calls below return null. That means
-        //  this AutonomousBillyMA has four null fields, and the BillyRapidFire built
-        //  from it points at nothing. initializeTelemetry() re-creates both correctly a
-        //  moment later, which is the only reason this doesn't crash. Delete this block;
-        //  initializeTelemetry() is the one place that should build them.
-        auton = new AutonomousBillyMA(
-                intake.getAutonomousBehaviors(),
-                ballPusher.getAutonomousBehaviors(),
-                flywheel.getAutonomousBehaviors(),
-                turret.getAutonomousBehaviors(),
-                telemetry
-        );
-        BRF = new BillyRapidFire(auton, 3);
-        BRF.abort();
         strategy = (mechAssembly, gamepad) -> {
             
             if(gamepad.a && BRF.isComplete())
             {
                 BRF.reset(3);
-                telemetry.addLine("Start Rapid Fire");
-                telemetry.update();
             }
             if(!BRF.isComplete())
             {
