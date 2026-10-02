@@ -55,13 +55,11 @@ import java.util.Set;
  */
 public abstract class MechAssembly
 {
-    protected interface IAssemblyStrategy 
-    { 
-    }
+    protected interface IAssemblyStrategy { }
     
-    public interface MacroIAssemblyStrategy<R>
+    public interface IMacroAssemblyStrategy<R>
     { 
-        Set <R> claims();
+        Set<R> claims();
         void start();
         void update(Gamepad gamepad);
         boolean isComplete();
