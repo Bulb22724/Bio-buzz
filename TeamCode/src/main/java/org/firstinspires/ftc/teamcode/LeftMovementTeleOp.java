@@ -22,7 +22,7 @@ public class LeftMovementTeleOp extends LinearOpMode {
         frontRight.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.REVERSE);
         frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);git
+        backLeft.setDirection(DcMotor.Direction.FORWARD);
 
         waitForStart();
 
