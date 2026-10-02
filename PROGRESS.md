@@ -12,10 +12,11 @@
 | IX   |      |      |         |       |
 | X    |      |      |         |       |
 # Measured Values
-- Camera, resolution: Logitech C720, 640x480
+- Camera, resolution: Logitech C720 "Webcam 1", 640x480
 - Camera height (in), pitch (deg), offset from robot center (X/Y) in: 
 - Horizontal FOV (deg), fx (pixels):
 - Tag detection range with 4/2/1 3.6in tags (in):
+- Wheel motor names: CH: rf 0; rb 1; claw 2; elevator 3 EH: lf 0; lb 1
 ## Problems and fixes
 - (date) problem --> fix 
 # Quick GIT reference
