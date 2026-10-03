@@ -41,6 +41,41 @@
                 "reveal": "always",
                 "focus": true
             }
+        },
+        {
+            "label": "FTC: ADB Devices",
+            "type": "shell",
+            "command": "adb devices",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true
+            }
+        },
+        {
+            "label": "FTC: ADB Disconnect",
+            "type": "shell",
+            "command": "adb disconnect",
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true
+            }
+        },
+        {
+            "label": "FTC: Logcat",
+            "type": "shell",
+            "command": "adb logcat",
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated"
+            }
         }
     ]
 }

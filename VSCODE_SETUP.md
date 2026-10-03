@@ -55,6 +55,9 @@ Deploy while you have internet if you can. Once your laptop joins the Control Hu
 | FTC: Build and Install (Deploy) | Builds and installs to the robot (`Cmd+Shift+B`) |
 | FTC: Clean Project | Deletes build outputs. Use it if a build behaves strangely |
 | FTC: Connect via ADB (Wi-Fi) | Runs `adb connect 192.168.43.1:5555` |
+| FTC: ADB Devices | Lists connected devices (`adb devices`). Your robot should show as `device` |
+| FTC: ADB Disconnect | Disconnects all adb connections (`adb disconnect`). Use it before reconnecting if a device shows `offline` |
+| FTC: Logcat | Streams the robot's logs (`adb logcat`) in its own terminal panel. Press `Ctrl+C` to stop |
 
 ## Keyboard shortcuts
 
