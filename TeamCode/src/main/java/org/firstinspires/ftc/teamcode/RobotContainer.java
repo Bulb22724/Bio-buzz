@@ -28,14 +28,9 @@ public class RobotContainer extends Robot {
 
     private final List<SubsystemIF> subsystems = new ArrayList<>();
     private final ElapsedTime timer = new ElapsedTime();
-
-
     private final List<LynxModule> hubs;
-
     private final Chassis chassis;
-
     private final Shooter shooter;
-
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
     private GamepadEx gamepad1;

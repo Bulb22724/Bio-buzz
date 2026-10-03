@@ -24,7 +24,9 @@ public class Shooter extends SubsystemIF {
     public void teleopInit() {
 
     }
-    public void loop() {
+
+    @Override
+    public void periodic() {
 
     }
 
