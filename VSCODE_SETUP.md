@@ -2,6 +2,30 @@
 
 This project can be built and deployed to the robot from VS Code, without Android Studio.
 
+## Getting the project (per computer)
+
+1. **Install Git** ([git-scm.com](https://git-scm.com/downloads), default options) and **VS Code** ([code.visualstudio.com](https://code.visualstudio.com/)).
+2. **Choose a folder that is NOT synced by OneDrive, Dropbox or similar.** On Windows, `Documents`, `Desktop` and `Pictures` are often synced by OneDrive, so a repo cloned there will fail to build with `AccessDeniedException` (the sync locks files while Gradle writes them). Use a plain folder such as `C:\Dev` (Windows) or `~/Projects` (macOS). Avoid spaces in the path if you can.
+3. **Clone the repo.** On Windows (PowerShell):
+
+   ```powershell
+   mkdir C:\Dev
+   cd C:\Dev
+   git clone https://github.com/MantaBots27318/biobuzz
+   cd biobuzz
+   code .
+   ```
+
+   On macOS: `mkdir -p ~/Projects && cd ~/Projects && git clone https://github.com/MantaBots27318/biobuzz && cd biobuzz && code .`
+
+   To push code you must be a collaborator on the GitHub repository. Before your first commit, set your identity:
+
+   ```bash
+   git config --global user.name "Your Name"
+   git config --global user.email "you@example.com"
+   ```
+4. Then do the one-time setup below, **from the repo root** (the folder containing `gradlew`, `FtcRobotController` and `TeamCode`).
+
 ## One-time setup (per computer)
 
 Follow the section for your operating system. Everything is typed in a terminal: Terminal on macOS, **PowerShell** on Windows. In VS Code, open the integrated terminal with `` Ctrl+` ``.
@@ -161,4 +185,14 @@ On Windows and Linux, use `Ctrl` where the table says `Cmd`.
 - **`No connected devices`** when deploying: run **FTC: Connect via ADB (Wi-Fi)**, then **FTC: ADB Devices**.
 - **`./gradlew` fails in PowerShell**: use `.\gradlew.bat`.
 - **Robot not listed, `offline` or `unauthorized` in `adb devices`**: run **FTC: ADB Disconnect**, then connect again. Check the Control Hub screen or Driver Hub for a prompt to authorize the computer.
+- **`AccessDeniedException` during a build (Windows)**: the repo is inside a OneDrive-synced folder (the path contains `OneDrive`). Clone it again outside OneDrive, for example in `C:\Dev`, and recreate `local.properties` there (it is not in git).
+- **`gradlew.bat` is not recognized**: the terminal is not in the repo root. Run `pwd` and `dir gradlew.bat`; if the file is missing, `cd` into the folder that contains it, or reopen VS Code on that folder (File > Open Folder).
+- **`java` is not recognized, or `$env:JAVA_HOME` is empty, right after the setup (Windows)**: Windows only gives new environment variables to programs started after a new login. Sign out of Windows and back in (or restart the computer), then reopen VS Code. To check what is stored: `[Environment]::GetEnvironmentVariable("JAVA_HOME", "User")`. To keep working in the current terminal only, run `$env:JAVA_HOME = [Environment]::GetEnvironmentVariable("JAVA_HOME", "User")` and add the JDK `bin` folder to `$env:Path`.
+- **The first Gradle build is very slow, stuck on "Starting a Gradle Daemon"**: it downloads Gradle and all dependencies, which can take 5 to 15 minutes, especially on Windows with an antivirus. Check that a Java process is active in Task Manager, or rerun with `.\gradlew.bat assembleDebug --console=plain --info` to see what it is doing. Make sure you are on a real internet connection, not the robot's Wi-Fi.
+- **`adb connect` says `failed to connect`, or `adb devices` shows `offline`, even though the robot answers `ping`**:
+  1. Reset adb: `adb disconnect`, `adb kill-server`, `adb start-server`, then **FTC: Connect via ADB (Wi-Fi)**.
+  2. Test the adb port: `Test-NetConnection 192.168.43.1 -Port 5555` (PowerShell). If `TcpTestSucceeded` is `False`, something blocks it. On Windows, set the robot's Wi-Fi network to **Private** (Settings > Network & internet > Wi-Fi > the `FTC-xxxx` network), or allow `adb.exe` through the firewall or antivirus.
+  3. Check `where.exe adb` (Windows) or `which adb` (macOS). There should be one adb, from the SDK `platform-tools`. Close Android Studio, which runs its own adb, and update Platform-Tools in the SDK Manager if it is old.
+  4. Make sure no other computer is connected to the same Control Hub, and restart the Control Hub if needed.
+  5. As a last resort, use a USB cable.
 - **Autocomplete or go-to-definition is missing for FTC classes**: this is a known limitation of the Java extension with Android projects. Building and deploying still work.
