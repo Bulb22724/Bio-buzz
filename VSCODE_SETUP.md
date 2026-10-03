@@ -4,49 +4,91 @@ This project can be built and deployed to the robot from VS Code, without Androi
 
 ## One-time setup (per computer)
 
-1. **Install a JDK.** The easiest option is the JDK bundled with Android Studio. Add this to `~/.zshrc` (macOS):
+Follow the section for your operating system. Everything is typed in a terminal: Terminal on macOS, **PowerShell** on Windows. In VS Code, open the integrated terminal with `` Ctrl+` ``.
+
+You need three things on every computer: a **JDK**, the **Android SDK** (which includes `adb`), and a **`local.properties`** file telling Gradle where the SDK is. The easiest way to get the JDK and the SDK is to install Android Studio once, even if you never use it afterwards.
+
+### macOS
+
+1. **Install Android Studio** (it provides the JDK and the SDK). The SDK is in `~/Library/Android/sdk`.
+2. **Set up the environment.** From the repo root (the folder containing `gradlew`, `FtcRobotController` and `TeamCode`), run:
 
    ```bash
-   export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-   ```
-
-   If you don't have Android Studio, install JDK 17 or newer and point `JAVA_HOME` at it.
-
-2. **Install the Android SDK.** You need the SDK and its `platform-tools` (which include `adb`). Installing Android Studio once is the simplest way to get them. The default location on macOS is `~/Library/Android/sdk`.
-
-3. **Add ADB to your PATH** (macOS, default SDK location):
-
-   ```bash
-   echo 'export PATH=$PATH:~/Library/Android/sdk/platform-tools' >> ~/.zshrc
+   echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties
+   echo 'export ANDROID_HOME=$HOME/Library/Android/sdk' >> ~/.zshrc
+   echo 'export PATH=$ANDROID_HOME/platform-tools:$PATH' >> ~/.zshrc
+   echo 'export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"' >> ~/.zshrc
+   echo 'export PATH=$JAVA_HOME/bin:$PATH' >> ~/.zshrc
    source ~/.zshrc
    ```
 
-   Check it with `adb version`.
-
-4. **Install the VS Code extension.** In VS Code, open Extensions (`Cmd+Shift+X`) and install **Extension Pack for Java** by Microsoft.
-
-5. **Open the project.** In VS Code, choose File > Open Folder and pick the repo root (the folder containing `gradlew`, `FtcRobotController` and `TeamCode`).
-
-6. **Check that Gradle works.** In the VS Code terminal:
+   If your Mac uses bash instead of zsh, replace `~/.zshrc` with `~/.bash_profile`.
+3. **Check it.** Open a new terminal, then:
 
    ```bash
-   ./gradlew tasks
+   echo $JAVA_HOME
+   adb version
+   java -version
    ```
 
-   The first run downloads Gradle and dependencies, so do it while you have internet.
+### Windows
 
-On Windows, use `gradlew.bat`, set `JAVA_HOME` in the system environment variables, and add `%LOCALAPPDATA%\Android\Sdk\platform-tools` to `Path`.
+1. **Install Android Studio** (it provides the JDK and the SDK). The SDK is in `%LOCALAPPDATA%\Android\Sdk`, usually `C:\Users\<you>\AppData\Local\Android\Sdk`. The JDK is in `C:\Program Files\Android\Android Studio\jbr`.
+2. **Set up the environment.** In PowerShell, from the repo root, run these one at a time:
+
+   ```powershell
+   # Tell Gradle where the SDK is (forward slashes are required in this file)
+   "sdk.dir=$($env:LOCALAPPDATA -replace '\\','/')/Android/Sdk" | Out-File -Encoding ascii local.properties
+
+   # Environment variables (stored for your user account)
+   [Environment]::SetEnvironmentVariable("ANDROID_HOME", "$env:LOCALAPPDATA\Android\Sdk", "User")
+   [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Android\Android Studio\jbr", "User")
+
+   # Add adb and the JDK to your PATH without overwriting it
+   $p = [Environment]::GetEnvironmentVariable("Path", "User")
+   [Environment]::SetEnvironmentVariable("Path", "$p;$env:LOCALAPPDATA\Android\Sdk\platform-tools;C:\Program Files\Android\Android Studio\jbr\bin", "User")
+   ```
+
+   Do not use `setx PATH`: it cuts the PATH at 1024 characters and can corrupt it.
+3. **Close and reopen VS Code completely** (not just the terminal). Environment variables are only read when a program starts.
+4. **Check it.** In a new terminal:
+
+   ```powershell
+   echo $env:JAVA_HOME
+   adb version
+   java -version
+   ```
+
+   If Android Studio is installed somewhere else, adjust the paths. You can see or edit the variables in Start > "Edit environment variables for your account".
+
+### Both systems
+
+- **Install the VS Code extension.** Open Extensions (`Ctrl+Shift+X`, `Cmd+Shift+X` on macOS) and install **Extension Pack for Java** by Microsoft.
+- **Open the project.** In VS Code, choose File > Open Folder and pick the repo root.
+- **Build once with internet.** In the terminal:
+
+  | macOS | Windows |
+  |---|---|
+  | `./gradlew assembleDebug` | `.\gradlew.bat assembleDebug` |
+
+  This downloads Gradle and every dependency into a local cache (`~/.gradle`). Do it **before** joining the robot's Wi-Fi: a laptop connected to the Control Hub has no internet. After that, builds work offline. A new computer needs this step too, and so does any change to a dependency in a `build.gradle` file.
+- **`local.properties` is not in git** (it is in `.gitignore`) because it is specific to each computer. Every team member must create their own, and it is normal that it never shows up in `git status`.
+
+On Windows, `./gradlew` does not work in PowerShell: use `.\gradlew.bat`. The VS Code tasks below already do this for you.
 
 ## Deploying code to the robot
 
-1. **Connect to the robot.**
-   - **USB (Control Hub or Driver Hub):** plug your laptop into the Control Hub with a USB cable.
-   - **Wi-Fi (Control Hub):** join the Control Hub's Wi-Fi network (`FTC-xxxx`), then run the task **FTC: Connect via ADB (Wi-Fi)**. Run it from the Command Palette: `Cmd+Shift+P`, then "Tasks: Run Task".
-2. **Confirm the robot is visible.** In the terminal, run `adb devices`. Your robot should be listed as `device`. If it says `unauthorized` or isn't listed, see Troubleshooting.
-3. **Build and deploy.** Press `Cmd+Shift+B` (the default build task, **FTC: Build and Install (Deploy)**). This runs `./gradlew installDebug`, which compiles your code and installs the app on the robot.
-4. **Run your OpMode.** On the Driver Station, select your OpMode and press Init or Start as usual.
+The robot is reached over Wi-Fi, so your computer has no internet while connected. Do the one-time setup and the first build first.
 
-Deploy while you have internet if you can. Once your laptop joins the Control Hub's Wi-Fi it has no internet access, so Gradle can't download anything new.
+1. **Join the Control Hub's Wi-Fi network** (`FTC-xxxx`).
+2. **Connect adb to the robot.** From the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`), choose "Tasks: Run Task", then **FTC: Connect via ADB (Wi-Fi)**. This runs `adb connect 192.168.43.1:5555`. You can also type that command yourself in the terminal.
+3. **Confirm the robot is visible.** Run the task **FTC: ADB Devices** (or `adb devices`). Your robot should be listed as `device`. If it says `offline` or `unauthorized`, or isn't listed, see Troubleshooting.
+4. **Build and deploy.** Press `Cmd+Shift+B` (`Ctrl+Shift+B` on Windows). This is the default build task, **FTC: Build and Install (Deploy)**, which runs `installDebug`: it compiles your code and installs the app on the robot.
+5. **Run your OpMode.** On the Driver Station, select your OpMode and press Init or Start as usual.
+
+**Compile or deploy?** `assembleDebug` only compiles (no robot needed, good to check your code). `installDebug` compiles and then installs on the robot, so it fails if no device is connected. `installDebug` already includes `assembleDebug`.
+
+If you use a USB cable instead of Wi-Fi, skip steps 1 and 2: plug the Control Hub in and check `adb devices`.
 
 ## Tasks
 
@@ -112,7 +154,11 @@ On Windows and Linux, use `Ctrl` where the table says `Cmd`.
 ## Troubleshooting
 
 - **`Minimum supported Gradle version is ...`**: Android Studio's "Upgrade Android Gradle Plugin" assistant changed the build files. Do not accept that prompt. To undo it, run `git checkout -- build.gradle build.common.gradle gradle.properties gradle/wrapper/gradle-wrapper.properties TeamCode/build.gradle`. The SDK release pins the Gradle and Android Gradle Plugin versions.
-- **`command not found: adb`**: the PATH change didn't apply. Open a new terminal, or recheck step 3.
-- **`JAVA_HOME` is not set or invalid**: recheck step 1, and restart VS Code so its terminals pick up the change.
-- **Robot not listed or `unauthorized` in `adb devices`**: reconnect the cable or Wi-Fi. Check the Control Hub screen or Driver Hub for a prompt to authorize the computer.
+- **`command not found: adb`** (macOS) or **`'adb' is not recognized`** (Windows): the PATH change didn't apply. Open a new terminal (on Windows, restart VS Code completely) and recheck the setup for your system.
+- **`JAVA_HOME` is not set or invalid**: recheck the setup, and restart VS Code so its terminals pick up the change. The path must point to the folder that contains `bin`.
+- **`SDK location not found`**: `local.properties` is missing or wrong. Recreate it with the setup commands. On Windows, use forward slashes in the path.
+- **Could not resolve / download errors while on the robot's Wi-Fi**: Gradle needs a dependency that isn't cached yet. Leave the robot's Wi-Fi, run `assembleDebug` with internet, then reconnect. Adding `--offline` to a Gradle command makes it use only the cache and fail immediately if something is missing.
+- **`No connected devices`** when deploying: run **FTC: Connect via ADB (Wi-Fi)**, then **FTC: ADB Devices**.
+- **`./gradlew` fails in PowerShell**: use `.\gradlew.bat`.
+- **Robot not listed, `offline` or `unauthorized` in `adb devices`**: run **FTC: ADB Disconnect**, then connect again. Check the Control Hub screen or Driver Hub for a prompt to authorize the computer.
 - **Autocomplete or go-to-definition is missing for FTC classes**: this is a known limitation of the Java extension with Android projects. Building and deploying still work.
