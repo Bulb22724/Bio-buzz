@@ -27,7 +27,7 @@ Before starting any new work, switch to `main` and pull the latest changes so yo
 
 (on your terminal copy paste this in)
 git checkout yourname(your personal branch)-branch
-git pull origin main
+git pull origin master
 
 ### Step 2: Save, then "Push" your code to your branch on Github
 Android Studio saves automatically- but its a good habit to be saving before you push. Ctrl+S is the command to save...
@@ -36,5 +36,5 @@ Push your code by going to Commit on the left hand side, and press commit and pu
 ### Step 3: Open a pull request from your branch to the Master Branch
 Open a pull request by going to GitHub, this repository, click on pull requests, and submit new request. I will be reviewing your code to ensure there are no major errors, and to protect against accidental pushes. 
 Lastly, run:
-git pull origin main
+git pull origin master
 (to sync up with the master branch), and then you're all set! WHOOOOO!
