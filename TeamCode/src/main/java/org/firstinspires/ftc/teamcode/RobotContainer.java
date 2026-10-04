@@ -17,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.chassis.Chassis;
 import org.firstinspires.ftc.teamcode.chassis.ChassisCommands;
 import org.firstinspires.ftc.teamcode.shooter.Shooter;
+import org.firstinspires.ftc.teamcode.shooter.ShooterCommands;
 import org.firstinspires.ftc.teamcode.util.SubsystemIF;
 
 
@@ -31,6 +32,8 @@ public class RobotContainer extends Robot {
     private final List<LynxModule> hubs;
     private final Chassis chassis;
     private final Shooter shooter;
+
+    ShooterCommands shooterCommand;
     private HardwareMap hardwareMap;
     private Telemetry telemetry;
     private GamepadEx gamepad1;
@@ -85,6 +88,12 @@ public class RobotContainer extends Robot {
                 () -> -gamepad1.getRightX()));
         gamepad1.getGamepadButton(GamepadKeys.Button.START)
                 .whenPressed(chassis::resetHeading);
+
+        gamepad2.getGamepadButton(GamepadKeys.Button.A).whenPressed(shooterCommand.shooting(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.B).whenPressed(shooterCommand.stop(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER).whenPressed(shooterCommand.increaseShotPower(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER).whenPressed(shooterCommand.decreaseShotPower(shooter));
+        gamepad2.getGamepadButton(GamepadKeys.Button.X).whenPressed(shooterCommand.resetShot(shooter));
     }
 
     public void stop() {
