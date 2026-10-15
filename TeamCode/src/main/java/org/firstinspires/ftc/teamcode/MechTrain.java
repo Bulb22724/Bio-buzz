@@ -18,6 +18,7 @@ public class MechTrain {
         back_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    //управление движением
     public void move(double g1x, double g1y, double rt) {
         front_left.setPower(g1y - g1x + rt);
         front_right.setPower(g1y + g1x - rt);
