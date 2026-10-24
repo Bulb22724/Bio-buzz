@@ -8,9 +8,9 @@ public class MechTrain {
 
     public MechTrain(LinearOpMode opMode) {
         front_left = opMode.hardwareMap.get(DcMotor.class, "front_left");
-        front_right = opMode.hardwareMap.get(DcMotor.class, "front_right");
+        front_right = -opMode.hardwareMap.get(DcMotor.class, "front_right");
         back_left = opMode.hardwareMap.get(DcMotor.class, "back_left");
-        back_right = opMode.hardwareMap.get(DcMotor.class, "back_right");
+        back_right = -opMode.hardwareMap.get(DcMotor.class, "back_right");
 
         front_left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         front_right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
