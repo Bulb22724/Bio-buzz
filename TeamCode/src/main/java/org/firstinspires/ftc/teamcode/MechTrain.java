@@ -31,10 +31,10 @@ public class MechTrain {
 
     //управление движением
     public void move(double g1x, double g1y, double rt) {
-        front_left.setPower(g1y - g1x + rt);
-        front_right.setPower(g1y + g1x - rt);
-        back_left.setPower(g1y + g1x + rt);
-        back_right.setPower(g1y - g1x - rt);
+        front_left.setPower(g1y + g1x + rt);
+        front_right.setPower(g1y - g1x + rt);
+        back_left.setPower(g1y - g1x + rt);
+        back_right.setPower(g1y + g1x + rt);
     }
     //Возвращает [мощность мотора, i, предыдущая ошибка]
     public double[] pid(double e, double i, double el){
