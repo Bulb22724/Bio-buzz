@@ -9,6 +9,7 @@ public class TeleOp extends LinearOpMode {
     // время для затупа операторов
     public double time_limit = 0.5;
     double rotation = 0;
+    //запуск режима телеопа
     public void runOpMode() throws InterruptedException {
         mechTrain = new MechTrain(this);
 
