@@ -7,22 +7,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class Cannon {
-    TeleOp teleOp;
-
     boolean cannon_on = false;
-    double time_limit = teleOp.time_limit;
     double position_open, position_close;
     //разница между открытым и закрытым положением
-    double op = 90;
-    ElapsedTime timer, timer_servo;
+    double op = 0.5;
+    ElapsedTime timer = new ElapsedTime();
+    ElapsedTime timer_servo = new ElapsedTime();
     DcMotor cannon_motor;
     Servo block_servo;
 
-    public Cannon(LinearOpMode opMode) {
+    public Cannon(LinearOpMode opMode, double tl) {
+        block_servo = opMode.hardwareMap.get(Servo.class, "block_servo");
         cannon_motor = opMode.hardwareMap.get(DcMotor.class, "cannon_motor");
         position_close = block_servo.getPosition();
         position_open = block_servo.getPosition() + op;
         //block_servo.setPosition(position_close);
+        double time_limit = tl;
     }
     //включение-выключение пушки с задержкой после запуска
     public void cannon_on_off(){

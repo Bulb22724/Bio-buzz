@@ -20,6 +20,7 @@ public class TeleOp extends LinearOpMode {
             mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger + gamepad1.right_trigger);
 
             if (gamepad1.a) {cannon.cannon_on_off();}
+            
             if (gamepad1.x) {cannon.manual_block_servo();} //cannon.auto_block_servo();
 
             if (gamepad1.b) {zaxvat.capture();}
