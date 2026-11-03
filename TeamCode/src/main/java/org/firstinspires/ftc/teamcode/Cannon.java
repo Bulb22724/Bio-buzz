@@ -14,14 +14,14 @@ public class Cannon {
     double position_close = 0.5;
     public static double time_to_shoot = 2;
     DcMotor cannon_motor;
-    Servo block_servo;
+    //Servo block_servo;
     ElapsedTime timer = new ElapsedTime();
 
-    public Cannon(LinearOpMode opMode) {
-        block_servo = opMode.hardwareMap.get(Servo.class, "block_servo");
-        cannon_motor = opMode.hardwareMap.get(DcMotor.class, "cannon_motor");
+    public Cannon(LinearOpMode opMode, String motor_name) {
+        //block_servo = opMode.hardwareMap.get(Servo.class, "block_servo");
+        cannon_motor = opMode.hardwareMap.get(DcMotor.class, motor_name);
 
-        block_servo.setPosition(position_close);
+        //block_servo.setPosition(position_close);
     }
 
     //включение-выключение пушки с задержкой после запуска
@@ -39,7 +39,7 @@ public class Cannon {
     }
 
     //перевод сервы, блокирующей ИЭ, в противоположное положение
-    public void manual_block_servo() {
+    /*public void manual_block_servo() {
         if (block_servo.getPosition() == position_close) {
             block_servo.setPosition(position_open);
         } else {
@@ -60,5 +60,5 @@ public class Cannon {
             block_servo.setPosition(position_close);
         }
 
-    }
+    }*/
 }
