@@ -3,16 +3,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp", group = "LinearOpMode")
 public class TeleOp extends LinearOpMode {
-    MechTrain mechTrain;
-    Cannon cannon;
-    Zaxvat zaxvat;
+
     // время для затупа операторов
-    public double time_limit = 0.5;
+    double time_limit = 0.5;
     double rotation = 0;
     //запуск режима телеопа
     public void runOpMode() throws InterruptedException {
-        mechTrain = new MechTrain(this);
-
+        MechTrain mechTrain = new MechTrain(this);
+        Cannon cannon = new Cannon(this, time_limit);
+        Zaxvat zaxvat = new Zaxvat(this, time_limit);
         waitForStart();
         while (opModeIsActive()) {
 
