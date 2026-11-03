@@ -6,21 +6,20 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class Zaxvat {
-    TeleOp teleOp;
-    ElapsedTime timer;
+    ElapsedTime timer = new ElapsedTime();
     DcMotor capture_motor;
-    double time_limit = teleOp.time_limit;
     boolean capture_on = false;
 
 
-    public Zaxvat(LinearOpMode opMode){
+    public Zaxvat(LinearOpMode opMode, double tl){
         capture_motor = opMode.hardwareMap.get(DcMotor.class, "capture_motor");
+        double time_limit = tl;
     }
     //включение-выключение заксвата с задержкой после запуска
     public void capture(){
-        if (capture_on && timer.seconds() >= time_limit) {capture_motor.setPower(0); capture_on = false;}
-        else if (timer.seconds() >= time_limit){capture_motor.setPower(1); capture_on = true;}
-        timer.startTime();
+        if (capture_on && timer.seconds() >= time_limit) {capture_motor.setPower(0); capture_on = false; timer.startTime();}
+        else if (timer.seconds() >= time_limit){capture_motor.setPower(1); capture_on = true; timer.startTime();}
+        
     }
 
 }
