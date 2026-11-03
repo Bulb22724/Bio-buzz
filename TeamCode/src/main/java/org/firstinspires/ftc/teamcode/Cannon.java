@@ -11,6 +11,7 @@ public class Cannon {
     double position_open, position_close;
     //разница между открытым и закрытым положением
     double op = 0.5;
+    double time_limit = 0;
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer_servo = new ElapsedTime();
     DcMotor cannon_motor;
@@ -22,7 +23,7 @@ public class Cannon {
         position_close = block_servo.getPosition();
         position_open = block_servo.getPosition() + op;
         //block_servo.setPosition(position_close);
-        double time_limit = tl;
+        time_limit = tl;
     }
     //включение-выключение пушки с задержкой после запуска
     public void cannon_on_off(){

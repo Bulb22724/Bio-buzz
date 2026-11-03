@@ -9,11 +9,12 @@ public class Zaxvat {
     ElapsedTime timer = new ElapsedTime();
     DcMotor capture_motor;
     boolean capture_on = false;
+    double time_limit = 0;
 
 
     public Zaxvat(LinearOpMode opMode, double tl){
         capture_motor = opMode.hardwareMap.get(DcMotor.class, "capture_motor");
-        double time_limit = tl;
+        time_limit = tl;
     }
     //включение-выключение заксвата с задержкой после запуска
     public void capture(){
