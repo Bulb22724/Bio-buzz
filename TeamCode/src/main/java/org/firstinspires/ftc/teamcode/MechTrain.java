@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -47,6 +48,26 @@ public class MechTrain {
         back_right.setPower(-(g1y - g1x - rt));
     }
 
+    /**
+     * Метод преобразования тиков мотора в мм пройденные
+     */
+    public double ticksToMm(int ticks){
+        double tpr = 537.7; //тиков в полном обороте
+        int diametr = 96; //Диаметр колеса в миллиметрах
+        return ticks / tpr * diametr * PI;
+    }
+
+    /**
+     * Метод, который устанавливает режим для всех моторов КБ
+     *
+     * @param mode - режим вращения
+     */
+    public void allSetMode(DcMotor.RunMode mode) {
+        front_left.setMode(mode);
+        front_right.setMode(mode);
+        back_left.setMode(mode);
+        back_right.setMode(mode);
+    }
     //Возвращает [мощность мотора, i, предыдущая ошибка]
     public double[] pid(double e, double i, double el) {
         double p = e * kp;
