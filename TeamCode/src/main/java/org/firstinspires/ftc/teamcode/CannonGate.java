@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-
+// напиши управление на прямую сервой, для калибровки на всякий.
+// желательно ещё и автоматическое открытие и закрытия заслонки по времени, как пушка раскрученна
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 

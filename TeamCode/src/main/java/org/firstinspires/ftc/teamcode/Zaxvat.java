@@ -9,10 +9,8 @@ public class Zaxvat {
     DcMotor capture_motor;
     boolean capture_on = false;
 
-
-
-    public Zaxvat(LinearOpMode opMode) {
-        capture_motor = opMode.hardwareMap.get(DcMotor.class, "capture_motor");
+    public Zaxvat(LinearOpMode opMode, String motor_name) {
+        capture_motor = opMode.hardwareMap.get(DcMotor.class, motor_name);
     }
 
     //включение-выключение заксвата с задержкой после запуска
@@ -24,7 +22,7 @@ public class Zaxvat {
             capture_motor.setPower(1);
             capture_on = true;
         }
-
     }
-
+    //возвращает включен ли захват
+    public boolean is_capture_on() {return capture_on;}
 }
