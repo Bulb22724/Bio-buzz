@@ -1,0 +1,39 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Test", group = "LinearOpMode")
+public class test extends LinearOpMode {
+    double rotation = 0;
+    boolean last_g1a = false;
+    boolean last_g1x = false;
+    boolean last_g1b = false;
+    private CannonGate pollenGate;
+
+    //запуск режима телеопа
+    public void runOpMode() throws InterruptedException {
+        MechTrain mechTrain = new MechTrain(this);
+        Cannon cannon = new Cannon(this, "cannon_motor");
+        Zaxvat zaxvat = new Zaxvat(this, "zaxvat_motor");
+        pollenGate = new CannonGate(this, "pollenGate");
+        waitForStart();
+
+        telemetry.addData("Управление ездой на левый стик", cannon.current_speed);
+
+        while (opModeIsActive()) {
+            mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger + gamepad1.right_trigger);
+
+            if (gamepad1.a && !last_g1a) {cannon.cannon_on_off();}
+
+            if (gamepad1.b && !last_g1b) {zaxvat.capture();}
+
+            if (gamepad1.x && !last_g1x) pollenGate.toggle();
+
+            last_g1a = gamepad1.a;
+            last_g1b = gamepad1.b;
+            last_g1x = gamepad1.x;
+
+            telemetry.update();
+        }
+    }
+
+}
