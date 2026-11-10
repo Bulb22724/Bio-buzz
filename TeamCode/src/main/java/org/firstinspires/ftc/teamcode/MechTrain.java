@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.pow;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -55,6 +56,12 @@ public class MechTrain {
         double tpr = 537.7; //тиков в полном обороте
         int diametr = 96; //Диаметр колеса в миллиметрах
         return ticks / tpr * diametr * PI;
+    }
+
+    public int mmToTicks(double mm) {
+        final double tpr = 537.7;
+        final int diameter = 96;
+        return (int) (mm * (tpr * diameter * PI));
     }
 
     /**
@@ -134,5 +141,39 @@ public class MechTrain {
             back_left.setPower(e_b_l * kp);
             back_right.setPower(-e_b_r * kp);
         }
+    }
+
+    public void auto_move_forward(double distance_mm) {
+        double power = 1;
+        int distance_ticks = mmToTicks(distance_mm);
+
+        allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        opMode.telemetry.addData("положение frontleft", front_left::getCurrentPosition);
+        opMode.telemetry.addData("положение frontright", front_right::getCurrentPosition);
+        opMode.telemetry.addData("положение backleft", back_left::getCurrentPosition);
+        opMode.telemetry.addData("положение backright", back_right::getCurrentPosition);
+
+        while (opMode.opModeIsActive()
+                && (front_left.getCurrentPosition() < distance_ticks
+                    || front_right.getCurrentPosition() < distance_ticks
+                    || back_right.getCurrentPosition() < distance_ticks
+                    || back_left.getCurrentPosition() < distance_ticks)
+        ) {
+            front_left.setPower(power);
+            front_right.setPower(-power);
+            back_left.setPower(power);
+            back_right.setPower(-power);
+
+            power = (double) (distance_ticks - front_right.getCurrentPosition()) / distance_ticks;
+
+            opMode.telemetry.update();
+        }
+
+        front_left.setPower(0);
+        front_right.setPower(0);
+        back_left.setPower(0);
+        back_right.setPower(0);
     }
 }

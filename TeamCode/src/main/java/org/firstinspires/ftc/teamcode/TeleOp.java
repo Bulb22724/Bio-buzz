@@ -26,7 +26,7 @@ public class TeleOp extends LinearOpMode {
         telemetry.addData("состояние заслонки пыльцы", pollenGate.servo::getPosition);
 
         while (opModeIsActive()) {
-            mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger + gamepad1.right_trigger);
+            mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger - gamepad1.right_trigger);
 
             if (gamepad1.a && !last_g1a) {cannon.cannon_on_off();}
             
