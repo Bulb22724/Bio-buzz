@@ -11,6 +11,6 @@ public class AutoForward extends LinearOpMode {
 
         waitForStart();
 
-        mechTrain.auto_move_forward(1000);
+        mechTrain.auto_move_forward_p(100);
     }
 }

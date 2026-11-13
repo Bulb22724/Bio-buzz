@@ -17,7 +17,7 @@ public class test extends LinearOpMode {
         pollenGate = new CannonGate(this, "pollenGate");
         waitForStart();
 
-        telemetry.addData("Управление ездой на левый стик", cannon.current_speed);
+        telemetry.addData("Скорость пушки", cannon.current_speed);
 
         while (opModeIsActive()) {
             mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger + gamepad1.right_trigger);

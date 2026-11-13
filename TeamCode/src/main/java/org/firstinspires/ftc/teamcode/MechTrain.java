@@ -117,24 +117,26 @@ public class MechTrain {
         el_b_r = b_r_pid[2];
 
         front_left.setPower(pow_f_l);
-        front_right.setPower(pow_f_r);
+        front_right.setPower(-pow_f_r);
         back_left.setPower(pow_b_l);
-        back_right.setPower(pow_b_r);
+        back_right.setPower(-pow_b_r);
 
 
     }
 
-    public void auto_move_p(double t) {
+    public void auto_move_forward_p(int ty) {
+        double target_y = ticksToMm(ty);
+
         while (opMode.opModeIsActive() &&
                 ((abs(e_f_l) > delta) ||
                 (abs(e_f_r) > delta) ||
                 (abs(e_b_l) > delta) ||
                 (abs(e_b_r) > delta))) {
 
-            e_f_l = t - front_left.getCurrentPosition();
-            e_f_r = t - front_right.getCurrentPosition();
-            e_b_l = t - back_left.getCurrentPosition();
-            e_b_r = t - back_right.getCurrentPosition();
+            e_f_l = target_y - front_left.getCurrentPosition();
+            e_f_r = target_y + front_right.getCurrentPosition();
+            e_b_l = target_y - back_left.getCurrentPosition();
+            e_b_r = target_y + back_right.getCurrentPosition();
 
             front_left.setPower(e_f_l * kp);
             front_right.setPower(-e_f_r * kp);
@@ -143,6 +145,27 @@ public class MechTrain {
         }
     }
 
+    public void auto_move_right_p(int tx) {
+        double target_x = ticksToMm(tx);
+
+        while (opMode.opModeIsActive() &&
+                ((abs(e_f_l) > delta) ||
+                        (abs(e_f_r) > delta) ||
+                        (abs(e_b_l) > delta) ||
+                        (abs(e_b_r) > delta))) {
+
+            e_f_l = target_x + front_left.getCurrentPosition();
+            e_f_r = target_x - front_right.getCurrentPosition();
+            e_b_l = target_x - back_left.getCurrentPosition();
+            e_b_r = target_x + back_right.getCurrentPosition();
+
+            front_left.setPower(-e_f_l * kp);
+            front_right.setPower(e_f_r * kp);
+            back_left.setPower(e_b_l * kp);
+            back_right.setPower(-e_b_r * kp);
+        }
+    }
+    //
     public void auto_move_forward(double distance_mm) {
         double power = 1;
         int distance_ticks = mmToTicks(distance_mm);
@@ -176,4 +199,5 @@ public class MechTrain {
         back_left.setPower(0);
         back_right.setPower(0);
     }
+
 }
