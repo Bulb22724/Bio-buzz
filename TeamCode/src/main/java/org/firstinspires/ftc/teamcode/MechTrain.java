@@ -127,6 +127,9 @@ public class MechTrain {
     public void auto_move_forward_p(int ty) {
         double target_y = ticksToMm(ty);
 
+        allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         while (opMode.opModeIsActive() &&
                 ((abs(e_f_l) > delta) ||
                 (abs(e_f_r) > delta) ||
@@ -143,10 +146,14 @@ public class MechTrain {
             back_left.setPower(e_b_l * kp);
             back_right.setPower(-e_b_r * kp);
         }
+        move(0, 0, 0);
     }
 
     public void auto_move_right_p(int tx) {
         double target_x = ticksToMm(tx);
+
+        allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (opMode.opModeIsActive() &&
                 ((abs(e_f_l) > delta) ||
@@ -164,6 +171,7 @@ public class MechTrain {
             back_left.setPower(e_b_l * kp);
             back_right.setPower(-e_b_r * kp);
         }
+        move(0, 0, 0);
     }
     //
     public void auto_move_forward(double distance_mm) {
