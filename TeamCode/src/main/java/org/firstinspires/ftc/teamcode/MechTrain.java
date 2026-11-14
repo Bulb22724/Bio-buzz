@@ -5,7 +5,6 @@ import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -23,7 +22,7 @@ public class MechTrain {
     // мощность подаваемая к каждому мотору по их сокращенным названиям
     double pow_f_l, pow_f_r, pow_b_l, pow_b_r;
     public static double delta = 10;
-    public static double kp = 1;
+    public static double kp = 5000;
     double ki = 0;
     double kd = 0;
     double td = 0.025;
@@ -128,25 +127,40 @@ public class MechTrain {
         double target_y = ticksToMm(ty);
 
         allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        front_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        back_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        e_f_l = target_y - front_left.getCurrentPosition();
+        e_f_r = target_y + front_right.getCurrentPosition();
+        e_b_l = target_y - back_left.getCurrentPosition();
+        e_b_r = target_y + back_right.getCurrentPosition();
+
 
         while (opMode.opModeIsActive() &&
-                ((abs(e_f_l) > delta) ||
+                (//(e_f_l > delta) ||
                 (abs(e_f_r) > delta) ||
-                (abs(e_b_l) > delta) ||
+                //(abs(e_b_l) > delta) ||
                 (abs(e_b_r) > delta))) {
 
             e_f_l = target_y - front_left.getCurrentPosition();
-            e_f_r = target_y + front_right.getCurrentPosition();
+            e_f_r = target_y - front_right.getCurrentPosition();
             e_b_l = target_y - back_left.getCurrentPosition();
             e_b_r = target_y + back_right.getCurrentPosition();
 
-            front_left.setPower(e_f_l * kp);
-            front_right.setPower(-e_f_r * kp);
-            back_left.setPower(e_b_l * kp);
-            back_right.setPower(-e_b_r * kp);
+            front_left.setPower(e_f_r / kp);
+            front_right.setPower(-e_f_r / kp);
+            back_left.setPower(e_b_r / kp);
+            back_right.setPower(-e_b_r / kp);
+
+            opMode.telemetry.addData("ошибка переднего левого", e_f_l);
+            opMode.telemetry.addData("ошибка переднего правого", e_f_r);
+            opMode.telemetry.addData("ошибка заднего левого", e_b_l);
+            opMode.telemetry.addData("ошибка заднего правого", e_b_r);
+
+            opMode.telemetry.update();
         }
         move(0, 0, 0);
+
     }
 
     public void auto_move_right_p(int tx) {
