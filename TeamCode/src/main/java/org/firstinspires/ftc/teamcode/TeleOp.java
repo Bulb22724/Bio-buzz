@@ -28,7 +28,7 @@ public class TeleOp extends LinearOpMode {
         while (opModeIsActive()) {
             mechTrain.move(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.left_trigger - gamepad1.right_trigger);
 
-            if (gamepad1.a && !last_g1a) {cannon.fireOnce(pollenGate);}
+            if (gamepad1.a && !last_g1a) {cannon.toggleFire(pollenGate);}
             
             if (gamepad1.b && !last_g1b) {zaxvat.capture();}
 
