@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Cannon {
     boolean cannon_on = false;
     //скорость пушки при 12 вольтах
-    public static double velocity_at_12v = 120;
+    public static final double velocity_at_12v = 120;
     double max_velocity_now = 0;
     double current_speed = 0;
     // погрешность в скорости пушки
@@ -46,4 +46,24 @@ public class Cannon {
 
     // возвращает скорость колеса пушки
     public double velocity_cannon() {return cannon_motor.getVelocity();}
+
+    // TODO: сделать linkedGate полем в Cannon, не параметром
+
+    /**
+     * Выстрелить один раз. Это необязательно будет один ИЭ.
+     * @param linkedGate (CannonGate) - заслонка, связанная с этой пушкой
+     * @throws InterruptedException если таймер прерван
+     */
+    public void fireOnce(CannonGate linkedGate) throws InterruptedException {
+        cannon_on_off();
+        ElapsedTime chargeTimer = new ElapsedTime(3);
+        chargeTimer.wait();
+
+        linkedGate.setExtended(false);
+        ElapsedTime shootTimer = new ElapsedTime(2);
+        shootTimer.wait();
+
+        linkedGate.setExtended(true);
+        cannon_on_off();
+    }
 }
