@@ -4,12 +4,13 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.List;
-
+@Config
 public class MechTrain {
     LinearOpMode opMode;
     DcMotor front_left, front_right, back_left, back_right;
@@ -21,12 +22,11 @@ public class MechTrain {
     double el_f_l, el_f_r, el_b_l, el_b_r;
     // мощность подаваемая к каждому мотору по их сокращенным названиям
     double pow_f_l, pow_f_r, pow_b_l, pow_b_r;
-    double delta = 10;
-    double kp = 1;
+    public static double delta = 10;
+    public static double kp = 1;
     double ki = 0;
     double kd = 0;
     double td = 0.025;
-
     public MechTrain(LinearOpMode opMode) {
         front_left = opMode.hardwareMap.get(DcMotor.class, "front_left");
         front_right = opMode.hardwareMap.get(DcMotor.class, "front_right");
