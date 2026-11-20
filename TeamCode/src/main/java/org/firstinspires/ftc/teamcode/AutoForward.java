@@ -25,7 +25,7 @@ public class AutoForward extends LinearOpMode {
 
         telemetry.addData("погрешность передвижения", MechTrain.delta);
 
-        mechTrain.auto_move_forward_p(target, 1.0 / 4.0);
+        mechTrain.auto_move_forward_p(target);
 
     }
 }

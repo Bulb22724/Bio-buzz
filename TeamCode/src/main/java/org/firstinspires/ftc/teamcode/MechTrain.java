@@ -7,6 +7,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.List;
+
 @Config
 public class MechTrain {
     public static final double KB_GEAR_RATIO = 32.0 / 18.0;
@@ -15,13 +17,6 @@ public class MechTrain {
     LinearOpMode opMode;
     DcMotor front_left, front_right, back_left, back_right;
     // ошибки к каждому мотору по их сокращенным названиям
-    double e_f_l, e_f_r, e_b_l, e_b_r;
-    // коэфициент i к каждому мотору по их сокращенным названиям
-    double i_f_l, i_f_r, i_b_l, i_b_r;
-    // прошлые ошибки к каждому мотору по их сокращенным названиям
-    double el_f_l, el_f_r, el_b_l, el_b_r;
-    // мощность подаваемая к каждому мотору по их сокращенным названиям
-    double pow_f_l, pow_f_r, pow_b_l, pow_b_r;
     // максимальная погрешность, при которой продолжается автоматическое движение
     public static double delta = 10;
     public static double kp = 500;
@@ -73,69 +68,47 @@ public class MechTrain {
         back_right.setMode(mode);
     }
     //Возвращает [мощность мотора, i, предыдущая ошибка]
-    public double[] pid(double e, double i, double el) {
-        double p = e * kp;
-        i += e * kp * td;
-        double d = kd * (e - el) / td;
+    public List<Double> calc_e(int tx, int ty, int tr){
+        double ex_f_l = tx - front_left.getCurrentPosition();
+        double ex_f_r = tx - front_right.getCurrentPosition();
+        double ex_b_l = tx - back_left.getCurrentPosition();
+        double ex_b_r = tx - back_right.getCurrentPosition();
 
-        return new double[]{p + i + d, i, e};
+        double ey_f_l = ty - front_left.getCurrentPosition();
+        double ey_f_r = ty - front_right.getCurrentPosition();
+        double ey_b_l = ty - back_left.getCurrentPosition();
+        double ey_b_r = ty - back_right.getCurrentPosition();
 
+        double er_f_l = tr - front_left.getCurrentPosition();
+        double er_f_r = tr - front_right.getCurrentPosition();
+        double er_b_l = tr - back_left.getCurrentPosition();
+        double er_b_r = tr - back_right.getCurrentPosition();
+
+        double efull_f_l = ey_f_l - ex_f_l + er_f_l;
+        double efull_f_r = -ey_f_r - ex_f_r + er_f_r;
+        double efull_b_l = ey_b_l + ex_b_l + er_b_l;
+        double efull_b_r = -ey_b_r + ex_b_r + er_b_r;
+
+        return List.of(efull_f_l, efull_f_r, efull_b_l, efull_b_r);
     }
-
-    /**
-     * автономно доезжает до заданной позиции
-     *
-     * @param t позиция до которой надо доехать
-     */
-    public void auto_move(double t) {
-        e_f_l = t - front_left.getCurrentPosition();
-        e_f_r = t - front_right.getCurrentPosition();
-        e_b_l = t - back_left.getCurrentPosition();
-        e_b_r = t - back_right.getCurrentPosition();
-
-        double[] f_l_pid = pid(e_f_l, i_f_l, el_f_l);
-        pow_f_l = f_l_pid[0];
-        i_f_l = f_l_pid[1];
-        el_f_l = f_l_pid[2];
-
-        double[] f_r_pid = pid(e_f_r, i_f_r, el_f_r);
-        pow_f_r = f_r_pid[0];
-        i_f_r = f_r_pid[1];
-        el_f_r = f_r_pid[2];
-
-        double[] b_l_pid = pid(e_b_l, i_b_l, el_b_l);
-        pow_b_l = b_l_pid[0];
-        i_b_l = b_l_pid[1];
-        el_b_l = b_l_pid[2];
-
-        double[] b_r_pid = pid(e_b_r, i_b_r, el_b_r);
-        pow_f_l = b_r_pid[0];
-        i_b_r = b_r_pid[1];
-        el_b_r = b_r_pid[2];
-
-        front_left.setPower(pow_f_l);
-        front_right.setPower(-pow_f_r);
-        back_left.setPower(pow_b_l);
-        back_right.setPower(-pow_b_r);
-
-
-    }
-
     /**
      * Проехать вперёд
      * @param ty (double) целевое положение в мм
      */
-    public void auto_move_forward_p(double ty, double powerScale) {
+    public void auto_move_p(double tx, double ty, double tr) {
         int target_y = mmToTicks(ty);
+        int target_x = mmToTicks(tx);
+        int target_r = mmToTicks(tr);
 
         allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        e_f_l = target_y - front_left.getCurrentPosition();
-        e_f_r = target_y - front_right.getCurrentPosition();
-        e_b_l = target_y - back_left.getCurrentPosition();
-        e_b_r = target_y - back_right.getCurrentPosition();
+        List<Double> list_e = calc_e(target_x, target_y, target_r);
 
+        double e_f_l = list_e.get(0);
+        double e_f_r = list_e.get(1);
+        double e_b_l = list_e.get(2);
+        double e_b_r = list_e.get(3);
 
         while (opMode.opModeIsActive() &&
                 ((e_f_l > delta) ||
@@ -143,15 +116,10 @@ public class MechTrain {
                 (e_b_l > delta) ||
                 (-e_b_r > delta))) {
 
-            e_f_l = target_y + front_left.getCurrentPosition();
-            e_f_r = target_y - front_right.getCurrentPosition();
-            e_b_l = target_y + back_left.getCurrentPosition();
-            e_b_r = target_y - back_right.getCurrentPosition();
-
-            front_left.setPower((-e_f_l / kp) * powerScale);
-            front_right.setPower((e_f_r / kp) * powerScale);
-            back_left.setPower((-e_b_l / kp) * powerScale);
-            back_right.setPower((e_b_r / kp) * powerScale);
+            front_left.setPower(e_f_l / kp);
+            front_right.setPower(e_f_r / kp);
+            back_left.setPower(e_b_l / kp);
+            back_right.setPower(e_b_r / kp);
 
             opMode.telemetry.addData("ошибка переднего левого", e_f_l);
             opMode.telemetry.addData("ошибка переднего правого", e_f_r);
@@ -164,30 +132,6 @@ public class MechTrain {
 
     }
 
-    public void auto_move_right_p(int tx) {
-        double target_x = ticksToMm(tx);
-
-        allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        while (opMode.opModeIsActive() &&
-                ((abs(e_f_l) > delta) ||
-                        (abs(e_f_r) > delta) ||
-                        (abs(e_b_l) > delta) ||
-                        (abs(e_b_r) > delta))) {
-
-            e_f_l = target_x + front_left.getCurrentPosition();
-            e_f_r = target_x - front_right.getCurrentPosition();
-            e_b_l = target_x - back_left.getCurrentPosition();
-            e_b_r = target_x + back_right.getCurrentPosition();
-
-            front_left.setPower(-e_f_l * kp);
-            front_right.setPower(e_f_r * kp);
-            back_left.setPower(e_b_l * kp);
-            back_right.setPower(-e_b_r * kp);
-        }
-        move(0, 0, 0);
-    }
     //
     public void auto_move_forward(double distance_mm) {
         double power = 1;
