@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-// напиши управление на прямую сервой, для калибровки на всякий.
-// желательно ещё и автоматическое открытие и закрытия заслонки по времени, как пушка раскрученна
-// может я не увидел, но почему заслонка при старте не приезжает в начальное положение?
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -10,6 +7,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  *  Заслонка стрельбы
  */
 public class CannonGate {
+    public static final double EXTENDED_SERVO_POSITION = 0.5;
+    public static final double COLLAPSED_SERVO_POSITION = 0.8;
     public final Servo servo;
 
     private boolean currentlyExtended;
@@ -40,7 +39,7 @@ public class CannonGate {
      * @param extended (boolean) - должна ли заслонка закрыться.
      */
     public void setExtended(boolean extended) {
-        servo.setPosition(extended ? 1.0 : 0.5);
+        servo.setPosition(extended ? EXTENDED_SERVO_POSITION : COLLAPSED_SERVO_POSITION);
         currentlyExtended = extended;
     }
 

@@ -2,15 +2,16 @@ package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.pow;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import java.util.List;
 @Config
 public class MechTrain {
+    public static final double KB_GEAR_RATIO = 32.0 / 18.0;
+    public static final double ENCODER_TICKS_PER_REVOLUTION = 751.8347107438016 / KB_GEAR_RATIO;
+    public static final int WHEEL_DIAMETER_MM = 96;
     LinearOpMode opMode;
     DcMotor front_left, front_right, back_left, back_right;
     // ошибки к каждому мотору по их сокращенным названиям
@@ -21,8 +22,9 @@ public class MechTrain {
     double el_f_l, el_f_r, el_b_l, el_b_r;
     // мощность подаваемая к каждому мотору по их сокращенным названиям
     double pow_f_l, pow_f_r, pow_b_l, pow_b_r;
+    // максимальная погрешность, при которой продолжается автоматическое движение
     public static double delta = 10;
-    public static double kp = 5000;
+    public static double kp = 500;
     double ki = 0;
     double kd = 0;
     double td = 0.025;
@@ -52,15 +54,11 @@ public class MechTrain {
      * Метод преобразования тиков мотора в мм пройденные
      */
     public double ticksToMm(int ticks){
-        double tpr = 537.7; //тиков в полном обороте
-        int diametr = 96; //Диаметр колеса в миллиметрах
-        return ticks / tpr * diametr * PI;
+        return ticks * (WHEEL_DIAMETER_MM * PI / ENCODER_TICKS_PER_REVOLUTION);
     }
 
     public int mmToTicks(double mm) {
-        final double tpr = 537.7;
-        final int diameter = 96;
-        return (int) (mm * (tpr * diameter * PI));
+        return (int) (mm * (ENCODER_TICKS_PER_REVOLUTION / WHEEL_DIAMETER_MM * PI));
     }
 
     /**
@@ -123,34 +121,37 @@ public class MechTrain {
 
     }
 
-    public void auto_move_forward_p(int ty) {
-        double target_y = ticksToMm(ty);
+    /**
+     * Проехать вперёд
+     * @param ty (double) целевое положение в мм
+     */
+    public void auto_move_forward_p(double ty, double powerScale) {
+        int target_y = mmToTicks(ty);
 
         allSetMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        front_left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        back_right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        allSetMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         e_f_l = target_y - front_left.getCurrentPosition();
-        e_f_r = target_y + front_right.getCurrentPosition();
+        e_f_r = target_y - front_right.getCurrentPosition();
         e_b_l = target_y - back_left.getCurrentPosition();
-        e_b_r = target_y + back_right.getCurrentPosition();
+        e_b_r = target_y - back_right.getCurrentPosition();
 
 
         while (opMode.opModeIsActive() &&
-                (//(e_f_l > delta) ||
-                (abs(e_f_r) > delta) ||
-                //(abs(e_b_l) > delta) ||
-                (abs(e_b_r) > delta))) {
+                ((e_f_l > delta) ||
+                (-e_f_r > delta) ||
+                (e_b_l > delta) ||
+                (-e_b_r > delta))) {
 
-            e_f_l = target_y - front_left.getCurrentPosition();
+            e_f_l = target_y + front_left.getCurrentPosition();
             e_f_r = target_y - front_right.getCurrentPosition();
-            e_b_l = target_y - back_left.getCurrentPosition();
-            e_b_r = target_y + back_right.getCurrentPosition();
+            e_b_l = target_y + back_left.getCurrentPosition();
+            e_b_r = target_y - back_right.getCurrentPosition();
 
-            front_left.setPower(e_f_r / kp);
-            front_right.setPower(-e_f_r / kp);
-            back_left.setPower(e_b_r / kp);
-            back_right.setPower(-e_b_r / kp);
+            front_left.setPower((-e_f_l / kp) * powerScale);
+            front_right.setPower((e_f_r / kp) * powerScale);
+            back_left.setPower((-e_b_l / kp) * powerScale);
+            back_right.setPower((e_b_r / kp) * powerScale);
 
             opMode.telemetry.addData("ошибка переднего левого", e_f_l);
             opMode.telemetry.addData("ошибка переднего правого", e_f_r);
