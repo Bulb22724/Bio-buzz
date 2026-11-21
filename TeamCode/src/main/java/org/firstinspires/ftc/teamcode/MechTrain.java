@@ -116,6 +116,13 @@ public class MechTrain {
                 (e_b_l > delta) ||
                 (-e_b_r > delta))) {
 
+            list_e = calc_e(target_x, target_y, target_r);
+
+            e_f_l = list_e.get(0);
+            e_f_r = list_e.get(1);
+            e_b_l = list_e.get(2);
+            e_b_r = list_e.get(3);
+
             front_left.setPower(e_f_l / kp);
             front_right.setPower(e_f_r / kp);
             back_left.setPower(e_b_l / kp);
@@ -132,7 +139,6 @@ public class MechTrain {
 
     }
 
-    //
     public void auto_move_forward(double distance_mm) {
         double power = 1;
         int distance_ticks = mmToTicks(distance_mm);
